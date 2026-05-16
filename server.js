@@ -41,7 +41,7 @@ const playerSchema = new mongoose.Schema({
     reg_fee: { type: Number, default: 200 },
     registered_at: { type: Date, default: Date.now },
     isBanned: { type: Boolean, default: false }, // Admin panel එකට අවශ්‍ය නිසා Schema එකටම දැම්මා
-    payment_slip: { type: String, default: "" },   // 🆕 රිසිට් එකේ ලින්ක් එක සේව් වෙන්න
+    payment_slip: { type: String, default: "" },   // 🆕 රිසිට් එකේ ලින්ක් එක සේဝ် වෙන්න
     payment_status: { type: String, default: "Pending" } // 🆕 Pending, Approved, Free
 });
 
@@ -78,7 +78,7 @@ app.post('/api/register', async (req, res) => {
             finalStatus = "Free";
         }
 
-        // અලුත් ප්ලේයර්ව සේව් කිරීම
+        // අලුත් ප්ලේයර්ව සේව් කිරීම
         const newPlayer = new Player({ 
             whatsapp, 
             password, 
@@ -102,7 +102,7 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-// === 🔐 2. LOGIN API (UPDATED PROVIDING STATUS) ===
+// === 🔐 2. LOGIN API (UPDATED PROVIDING BAN STATUS) ===
 app.post('/api/login', async (req, res) => {
     try {
         const { whatsapp, password } = req.body;
@@ -120,9 +120,32 @@ app.post('/api/login', async (req, res) => {
                 ff_id: player.ff_id,
                 points: player.points,
                 reg_fee: player.reg_fee,
-                payment_status: player.payment_status, // Dashboard එකේ status පෙන්වන්න ඕන නිසා
-                payment_slip: player.payment_slip
+                payment_status: player.payment_status, 
+                payment_slip: player.payment_slip,
+                isBanned: player.isBanned // ✨ Frontend එකෙන් ලොගින් වෙද්දීම Ban ද කියලා බලන්න මෙතනට එකතු කරා
             }
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// === 🛡️ 2.1 [NEW] ⚡ CURRENT PLAYER STATUS CHECK API FOR AUTO-KICK ===
+// Frontend එකෙන් තත්පර 10න් 10ට මේකට කෝල් කරලා ප්ලේයර් Ban ද කියලා Live චෙක් කරනවා
+app.get('/api/players/:whatsapp', async (req, res) => {
+    try {
+        const { whatsapp } = req.params;
+        const player = await Player.findOne({ whatsapp });
+        
+        // ප්ලේයර් කෙනෙක් Database එකේ නැත්නම් (Admin එයාව සදහටම Delete කරලා නම්)
+        if (!player) {
+            return res.status(404).json({ isBanned: true, message: "Account deleted by Admin" });
+        }
+        
+        // ප්ලේයර්ගේ වත්මන් Ban තත්වය විතරක් සරලව යවනවා
+        res.json({
+            whatsapp: player.whatsapp,
+            isBanned: player.isBanned
         });
     } catch (err) {
         res.status(500).json({ error: err.message });
