@@ -1,4 +1,4 @@
-const express = require('express');
+1const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
@@ -41,7 +41,7 @@ app.post('/api/check-uid', async (req, res) => {
             url: `https://check-id-game3.p.rapidapi.com/game/free-fire?id=${uid}`,
             headers: {
                 'x-rapidapi-host': 'check-id-game3.p.rapidapi.com',
-                'x-rapidapi-key': process.env.RAPIDAPI_KEY // අපි මේක ආරක්ෂිතව Render Environment Variables වලට දාමු
+                'x-rapidapi-key': `ed9848b3fcmshe0244ae6d11d7fcp1f91aejsnec4d605515bc' // අපි මේක ආරක්ෂිතව Render Environment Variables වලට දාමු
             }
         };
 
