@@ -15,7 +15,6 @@
         .neon-border { box-shadow: 0 0 15px rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); }
         .neon-text { text-shadow: 0 0 10px rgba(249, 115, 22, 0.5); }
         
-        /* Loading Spinner Animation */
         .spinner {
             border: 3px solid rgba(255, 255, 255, 0.1);
             border-radius: 50%;
@@ -31,10 +30,8 @@
         }
     </style>
 </head>
-<html class="text-gray-100 min-h-screen">
-<body class="flex flex-col min-h-screen justify-between">
+<body class="flex flex-col min-h-screen justify-between text-gray-100">
 
-    <!-- ==================== SCREEN 1: AUTHENTICATION (LOGIN / REGISTER) ==================== -->
     <div id="authScreen" class="flex-grow flex flex-col items-center justify-center px-4 py-12">
         <div class="text-center mb-8">
             <h1 class="gaming-font text-4xl md:text-5xl font-black tracking-wider text-orange-500 neon-text uppercase">
@@ -43,7 +40,6 @@
             <p class="text-xs text-gray-500 uppercase tracking-widest mt-1">Ultimate Player Dashboard</p>
         </div>
 
-        <!-- Registration Box -->
         <div id="registerBox" class="w-full max-w-md bg-black/60 p-8 rounded-2xl neon-border backdrop-blur-md">
             <h2 class="gaming-font text-xl font-bold text-orange-500 mb-5 border-b border-orange-500/20 pb-2 uppercase">
                 🛡️ Create Account
@@ -58,12 +54,15 @@
                     <input type="password" id="reg_password" placeholder="••••••••" required class="w-full bg-gray-950 border border-gray-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Free Fire Name</label>
-                    <input type="text" id="reg_name" placeholder="In-Game Name" required class="w-full bg-gray-950 border border-gray-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500">
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Free Fire UID (Game ID)</label>
+                    <div class="relative">
+                        <input type="text" id="reg_id" oninput="autoVerifyUID()" placeholder="Enter Free Fire UID..." required class="w-full bg-gray-950 border border-gray-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500">
+                        <div id="uidLoader" class="absolute right-3 top-3 hidden"><div class="spinner !w-5 !height-5"></div></div>
+                    </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Free Fire UID</label>
-                    <input type="text" id="reg_id" placeholder="In-Game ID" required class="w-full bg-gray-950 border border-gray-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500">
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Free Fire Name (Auto-Fetched)</label>
+                    <input type="text" id="reg_name" placeholder="Type your ID above to auto-fetch..." required readonly class="w-full bg-gray-900 border border-gray-800 rounded-lg p-3 text-sm text-gray-400 cursor-not-allowed focus:outline-none">
                 </div>
                 <button type="submit" id="regBtn" class="w-full gaming-font bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 text-white font-black py-3 rounded-lg text-sm uppercase tracking-wider transition-all flex justify-center items-center gap-2">
                     <span>Register</span>
@@ -73,7 +72,6 @@
             <p id="regMessage" class="mt-4 text-center text-xs font-semibold hidden"></p>
         </div>
 
-        <!-- Login Box -->
         <div id="loginBox" class="w-full max-w-md bg-black/60 p-8 rounded-2xl neon-border backdrop-blur-md hidden">
             <h2 class="gaming-font text-xl font-bold text-orange-500 mb-5 border-b border-orange-500/20 pb-2 uppercase">
                 🔑 Player Login
@@ -97,55 +95,35 @@
     </div>
 
 
-    <!-- ==================== SCREEN 2: MAIN DASHBOARD & LEADERBOARD ==================== -->
     <div id="dashboardScreen" class="hidden flex-grow">
-        <!-- Dashboard Header -->
         <header class="text-center py-5 px-4 border-b border-red-900/20 bg-black/50 backdrop-blur-md flex justify-between items-center max-w-7xl mx-auto w-full">
-            <h1 class="gaming-font text-xl md:text-3xl font-black tracking-wider text-orange-500 neon-text uppercase">
-                HUB MAINBOARD
-            </h1>
-            <button onclick="logout()" class="gaming-font text-xs bg-red-600 hover:bg-red-500 text-white font-bold px-4 py-2 rounded uppercase tracking-wide transition-all">
-                Logout 🚪
-            </button>
+            <h1 class="gaming-font text-xl md:text-3xl font-black tracking-wider text-orange-500 neon-text uppercase">HUB MAINBOARD</h1>
+            <button onclick="logout()" class="gaming-font text-xs bg-red-600 hover:bg-red-500 text-white font-bold px-4 py-2 rounded uppercase tracking-wide transition-all">Logout 🚪</button>
         </header>
 
-        <!-- Dashboard Content Grid -->
         <main class="max-w-7xl mx-auto px-4 mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8 pb-12">
-            
-            <!-- Left Panel: User Profile info -->
             <section class="lg:col-span-1">
                 <div class="bg-black/80 p-6 rounded-2xl border border-green-500/30 shadow-[0_0_15px_rgba(34,197,94,0.05)] backdrop-blur-md">
-                    <h2 class="gaming-font text-base font-bold text-green-400 mb-4 border-b border-green-500/20 pb-2 uppercase">
-                        🎮 Player Profile
-                    </h2>
+                    <h2 class="gaming-font text-base font-bold text-green-400 mb-4 border-b border-green-500/20 pb-2 uppercase">🎮 Player Profile</h2>
                     <div class="space-y-4 text-sm">
                         <div class="flex justify-between border-b border-gray-900 pb-2"><span class="text-gray-400">In-Game Name:</span> <b id="dashName" class="text-white text-base">--</b></div>
                         <div class="flex justify-between border-b border-gray-900 pb-2"><span class="text-gray-400">Free Fire ID:</span> <b id="dashID" class="text-white">--</b></div>
                         <div class="flex justify-between border-b border-gray-900 pb-2"><span class="text-gray-400">Total Points:</span> <b id="dashPoints" class="text-orange-500 text-2xl font-black gaming-font">0</b></div>
                         <div class="flex justify-between border-b border-gray-900 pb-2"><span class="text-gray-400">Entry Status:</span> <b id="dashFee" class="text-white">--</b></div>
                     </div>
-                    
-                    <!-- WhatsApp Group Access -->
                     <div class="mt-6 pt-4 border-t border-gray-900 text-center">
                         <p class="text-xs text-gray-400 mb-2">👇 Join with official match group</p>
-                        <a href="https://chat.whatsapp.com/%E0%Bdouble%B6%E0%Bdouble%B1%E0%Bdouble%B4%E0%Bdouble%B1%E0%Bdouble%BB_%E0%Bdouble%B4%E0%Bdouble%Bca%E0%Bdouble%BB%E0%Bdouble%Bca%E0%Bdouble%B4%E0%Bdouble%Bdf_%E0%Bdouble%B5%E0%Bdouble%Bdd%E0%Bdouble%Bdb%E0%Bdouble%B1%E0%Bdouble%Bcf_%E0%Bdouble%B4%E0%Bdouble%Bca%E0%Bdouble%B1%E0%Bdouble%Bcf" target="_blank"
-                            class="block gaming-font bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg text-sm uppercase tracking-wider transition-all shadow-md shadow-green-600/10">
-                            💬 Join WhatsApp Group
-                        </a>
+                        <a href="https://chat.whatsapp.com/ඔයාගේ_ගෲප්_ලින්ක්_එක" target="_blank" class="block gaming-font bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg text-sm uppercase tracking-wider transition-all">💬 Join WhatsApp Group</a>
                     </div>
                 </div>
             </section>
 
-            <!-- Right Panel: The Standings Table -->
             <section class="lg:col-span-2">
                 <div class="bg-black/60 p-6 rounded-2xl neon-border backdrop-blur-md min-h-[450px]">
                     <div class="flex justify-between items-center mb-5 border-b border-red-500/20 pb-2">
-                        <h2 class="gaming-font text-base md:text-lg font-black text-red-500 uppercase tracking-wide">
-                            🏆 TOURNAMENT STANDINGS
-                        </h2>
+                        <h2 class="gaming-font text-base md:text-lg font-black text-red-500 uppercase tracking-wide">🏆 TOURNAMENT STANDINGS</h2>
                         <button onclick="loadLeaderboard()" class="text-xs bg-gray-900 hover:bg-gray-800 px-3 py-1.5 rounded-md text-gray-400 border border-gray-800 transition-all">🔄 Refresh</button>
                     </div>
-
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
@@ -166,11 +144,9 @@
         </main>
     </div>
 
-    <!-- Script Logic -->
     <script>
         const API_URL = window.location.origin;
 
-        // Switch Register and Login UI views inside Screen 1
         function switchAuth(showLogin) {
             document.getElementById('loginBox').classList.toggle('hidden', !showLogin);
             document.getElementById('registerBox').classList.toggle('hidden', showLogin);
@@ -178,23 +154,15 @@
             document.getElementById('loginMessage').classList.add('hidden');
         }
 
-        // Check user session storage on web app loading
         function checkSession() {
             const savedPlayer = JSON.parse(localStorage.getItem('ff_player'));
-            if(savedPlayer) {
-                switchToScreen(true, savedPlayer);
-            } else {
-                switchToScreen(false);
-            }
+            if(savedPlayer) { switchToScreen(true, savedPlayer); } else { switchToScreen(false); }
         }
 
-        // Toggle system screens completely
         function switchToScreen(isDashboard, playerData = null) {
             if(isDashboard && playerData) {
                 document.getElementById('authScreen').classList.add('hidden');
                 document.getElementById('dashboardScreen').classList.remove('hidden');
-                
-                // Set Profile metrics
                 document.getElementById('dashName').innerText = playerData.ff_name;
                 document.getElementById('dashID').innerText = playerData.ff_id;
                 document.getElementById('dashPoints').innerText = playerData.points;
@@ -204,7 +172,7 @@
             } else {
                 document.getElementById('dashboardScreen').classList.add('hidden');
                 document.getElementById('authScreen').classList.remove('hidden');
-                switchAuth(true); // Default to login box
+                switchAuth(true);
             }
         }
 
@@ -213,7 +181,55 @@
             switchToScreen(false);
         }
 
-        // LOAD LIVE LEADERBOARD STANDINGS
+        // === 💥 NEW: 100% AUTO FETCH NICKNAME LOGIC (NO BUTTON NEEDED) ===
+        let typingTimer;
+        function autoVerifyUID() {
+            clearTimeout(typingTimer);
+            const uidInput = document.getElementById('reg_id').value.trim();
+            const nameInput = document.getElementById('reg_name');
+            const msgEl = document.getElementById('regMessage');
+            const loader = document.getElementById('uidLoader');
+
+            // සාමාන්‍යයෙන් FF ID එකක් ඉලක්කම් 8ත් 12ත් අතර වෙනවා. 
+            // ඒ නිසා ඉලක්කම් 8කට වඩා වැඩි වුණාම විතරක් චෙක් කරන්න පටන් ගන්නවා.
+            if (uidInput.length >= 8) {
+                // ප්ලේයර් ටයිප් කරලා ඉවර වෙලා මිලි තත්පර 800ක් යනකන් ඉන්නවා (Debounce)
+                typingTimer = setTimeout(async () => {
+                    loader.classList.remove('hidden');
+                    msgEl.classList.add('hidden');
+                    nameInput.value = "Fetching Nickname...";
+
+                    try {
+                        const response = await fetch(`${API_URL}/api/check-uid`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ uid: uidInput })
+                        });
+                        const data = await response.json();
+
+                        if (response.ok && data.nickname) {
+                            nameInput.value = data.nickname;
+                            msgEl.className = "mt-4 text-center text-xs font-semibold block text-green-400 bg-green-500/10 p-2 rounded-lg border border-green-500/20";
+                            msgEl.innerText = `✅ Verified Player: ${data.nickname}`;
+                        } else {
+                            msgEl.className = "mt-4 text-center text-xs font-semibold block text-red-400 bg-red-500/10 p-2 rounded-lg border border-red-500/20";
+                            msgEl.innerText = "❌ Invalid Player ID! Please check again.";
+                            nameInput.value = "";
+                        }
+                    } catch (error) {
+                        msgEl.className = "mt-4 text-center text-xs font-semibold block text-red-400 bg-red-500/10 p-2 rounded-lg border border-red-500/20";
+                        msgEl.innerText = "Verification connection failed!";
+                        nameInput.value = "";
+                    } finally {
+                        loader.classList.add('hidden');
+                    }
+                }, 800); 
+            } else {
+                nameInput.value = "Type your ID above to auto-fetch...";
+                msgEl.classList.add('hidden');
+            }
+        }
+
         async function loadLeaderboard() {
             try {
                 const response = await fetch(`${API_URL}/api/leaderboard`);
@@ -245,20 +261,22 @@
             } catch (error) { console.error("Error loading standings:", error); }
         }
 
-        // REGISTRATION ACCOUNT FORM HANDLER
         document.getElementById('regForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('regBtn');
             const msgEl = document.getElementById('regMessage');
             
-            // Show Loading Spinner State inside button
+            const ff_name = document.getElementById('reg_name').value;
+            if(!ff_name || ff_name === "Type your ID above to auto-fetch..." || ff_name === "Fetching Nickname...") {
+                alert("කරුණාකර නිවැරදි Free Fire ID එකක් ඇතුළත් කර Nickname එක auto-load වන තෙක් සිටින්න!");
+                return;
+            }
+
             btn.disabled = true;
             btn.innerHTML = `<div class="spinner"></div> <span>Processing...</span>`;
-            msgEl.classList.add('hidden');
 
             const whatsapp = document.getElementById('reg_whatsapp').value;
             const password = document.getElementById('reg_password').value;
-            const ff_name = document.getElementById('reg_name').value;
             const ff_id = document.getElementById('reg_id').value;
 
             try {
@@ -285,16 +303,13 @@
             }
         });
 
-        // PLAYER SECURE LOGIN HANDLER
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('loginBtn');
             const msgEl = document.getElementById('loginMessage');
             
-            // Show Loading Spinner State inside button
             btn.disabled = true;
             btn.innerHTML = `<div class="spinner"></div> <span>Verifying...</span>`;
-            msgEl.classList.add('hidden');
 
             const whatsapp = document.getElementById('log_whatsapp').value;
             const password = document.getElementById('log_password').value;
@@ -308,7 +323,6 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    // Success! Delay briefly to let the animation look amazing, then mount
                     setTimeout(() => {
                         localStorage.setItem('ff_player', JSON.stringify(data.player));
                         switchToScreen(true, data.player);
