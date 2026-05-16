@@ -102,6 +102,20 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
+// 👥 3. සේරම ප්ලේයර්ස්ලාගේ ලිස්ට් එක ඇඩ්මින්ට ලබාදෙන API එක
+app.post('/api/admin/players', async (req, res) => {
+    const { adminPassword } = req.body;
+    if (adminPassword !== "admin123") return res.status(403).json({ message: "Invalid Admin Password!" });
+
+    try {
+        // ඔක්කොම ප්ලේයර්ස්ලාව Database එකෙන් ගන්නවා (WhatsApp, Name, Points, Ban status විතරක්)
+        const players = await Player.find({}, 'whatsapp ff_name points isBanned').sort({ points: -1 });
+        res.json(players);
+    } catch (err) {
+        res.status(500).json({ message: "Database error!" });
+    }
+});
+
 // === 🏆 3. LEADERBOARD API ===
 app.get('/api/leaderboard', async (req, res) => {
     try {
