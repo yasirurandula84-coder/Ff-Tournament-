@@ -59,20 +59,21 @@
     </div>
 
     <script>
-        // 🚀 Render එකේ ලින්ක් එක මෙතනට දාන්න මල්ලි
-        const API_URL = "https://ff-tournament-k4gk.onrender.com";
+        // 🚀 සයිට් එක හොස්ට් කරලා තියෙන ලින්ක් එක auto ම ගන්නවා, එතකොට කිසිම Network Error එකක් එන්නේ නැහැ!
+        const API_URL = window.location.origin;
 
-        // සයිට් එක ලෝඩ් වෙද්දීම දැනට සර්වර් එකේ තියෙන විස්තර ටික auto පිරෙන්න හැදුවා (ලේසි වෙන්න)
+        // සයිට් එක ලෝඩ් වෙද්දීම දැනට සර්වර් එකේ තියෙන විස්තර ටික auto පිරෙන කොටස
         window.onload = async function() {
             try {
                 const response = await fetch(`${API_URL}/api/settings`);
+                if (!response.ok) return;
                 const settings = await response.json();
                 
-                document.getElementById('admin_time').value = settings.nextMatchTime;
-                document.getElementById('admin_status').value = settings.liveStatus;
-                document.getElementById('admin_msg').value = settings.matchMessage;
-                document.getElementById('admin_map').value = settings.matchMap;
-            } catch (error) { console.error("Error loading current settings"); }
+                document.getElementById('admin_time').value = settings.nextMatchTime || "";
+                document.getElementById('admin_status').value = settings.liveStatus || "UPCOMING";
+                document.getElementById('admin_msg').value = settings.matchMessage || "";
+                document.getElementById('admin_map').value = settings.matchMap || "";
+            } catch (error) { console.error("Error loading current settings:", error); }
         };
 
         // දත්ත සර්වර් එකට යවන කොටස
@@ -89,6 +90,7 @@
 
             btn.disabled = true;
             btn.innerText = "Transmitting Data...";
+            msgEl.classList.add('hidden'); // පරණ මැසේජ් හැංගීම
 
             try {
                 const response = await fetch(`${API_URL}/api/settings/update`, {
@@ -101,14 +103,15 @@
                 if(response.ok) {
                     msgEl.className = "mt-4 text-center text-xs font-semibold block text-green-400 bg-green-500/10 p-3 rounded-lg border border-green-500/20";
                     msgEl.innerText = data.message;
-                    document.getElementById('admin_pass').value = ''; // password එක විතරක් ක්ලියර් කරනවා
+                    document.getElementById('admin_pass').value = ''; // Password එක විතරක් ක්ලියර් කරනවා
                 } else {
                     msgEl.className = "mt-4 text-center text-xs font-semibold block text-red-400 bg-red-500/10 p-3 rounded-lg border border-red-500/20";
-                    msgEl.innerText = data.message;
+                    msgEl.innerText = data.message || "Something went wrong!";
                 }
             } catch (error) { 
-                msgEl.className = "mt-4 text-center text-xs font-semibold block text-red-400 bg-red-500/10 p-3 rounded-lg";
-                msgEl.innerText = "Network Error!"; 
+                console.error("Submit Error:", error);
+                msgEl.className = "mt-4 text-center text-xs font-semibold block text-red-400 bg-red-500/10 p-3 rounded-lg border border-red-500/20";
+                msgEl.innerText = "Network Error! Please check server connection."; 
             }
             finally { btn.disabled = false; btn.innerText = "Update Live Dashboard"; }
         });
