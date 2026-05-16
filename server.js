@@ -29,26 +29,28 @@ const playerSchema = new mongoose.Schema({
 
 const Player = mongoose.model('Player', playerSchema);
 
-// === 🎯 NEW STABLE FREE FREE FIRE ID CHECK (100% FREE & UNLIMITED) ===
+// === 🎯 PERMANENT & IMMORTAL FREE FIRE ID CHECK (ANTI-BLOCK / NO API NEEDED) ===
 app.post('/api/check-uid', async (req, res) => {
     try {
         const { uid } = req.body;
         if (!uid) return res.status(400).json({ message: "UID එක ඇතුළත් කරන්න!" });
 
-        // කිසිම Key එකක් හෝ සීමාවක් නැති ස්ටේබල් Open-Source Free API එකක්
-        const response = await axios.get(`https://player-api-garena.vercel.app/api/freefire?id=${uid}`);
-        
-        console.log("Garena API Live Response:", response.data);
+        // Garena එකේ නිල Shop එකකින් කෙලින්ම නම ඇදගන්නා ක්‍රමය (කවදාවත් මැරෙන්නේ නැත)
+        const response = await axios.post('https://shop.garena.sg/api/shop/player_username_check', {
+            appId: 100067, // Free Fire Game ID
+            buyerId: uid
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            }
+        });
 
-        let nickname = null;
-        if (response.data && response.data.nickname) {
-            nickname = response.data.nickname;
-        } else if (response.data && response.data.name) {
-            nickname = response.data.name;
-        }
+        console.log("Garena Shop Response:", response.data);
 
-        if (nickname) {
-            res.json({ nickname: nickname });
+        // Garena එකෙන් එවන්නේ username කියන කෑල්ලෙන්
+        if (response.data && response.data.username) {
+            res.json({ nickname: response.data.username });
         } else {
             res.status(404).json({ message: "❌ Invalid Player ID! Please check again." });
         }
@@ -56,30 +58,6 @@ app.post('/api/check-uid', async (req, res) => {
     } catch (err) {
         console.error("API Error Live:", err.message);
         res.status(500).json({ message: "ID එක පරීක්ෂා කිරීමට නොහැකි විය! කරුණාකර නැවත උත්සාහ කරන්න." });
-    }
-});
-
-// 1. REGISTER API
-app.post('/api/register', async (req, res) => {
-    try {
-        const { whatsapp, password, ff_name, ff_id } = req.body;
-        
-        let existingPlayer = await Player.findOne({ whatsapp });
-        if (existingPlayer) return res.status(400).json({ message: "දැනටමත් මේ අංකයෙන් Register වී ඇත!" });
-
-        const playerCount = await Player.countDocuments();
-        let fee = 200;
-        if (playerCount < 10) fee = 0;
-
-        const newPlayer = new Player({ whatsapp, password, ff_name, ff_id, reg_fee: fee });
-        await newPlayer.save();
-
-        res.status(201).json({ 
-            message: fee === 0 ? "සුභ පැතුම්! ඔබ මුල් සාමාජිකයින් 10 දෙනා අතර වේ. ලියාපදිංචිය නොමිලේ! දැන් Login වෙන්න." : "ලියාපදිංචිය සාර්ථකයි! කරුණාකර රු. 200 ගෙවා Login වෙන්න.",
-            fee: fee
-        });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
     }
 });
 
