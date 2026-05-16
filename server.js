@@ -102,14 +102,14 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// 👥 3. සේරම ප්ලේයර්ස්ලාගේ ලිස්ට් එක ඇඩ්මින්ට ලබාදෙන API එක
+// 👥 3. සේරම ප්ලේයර්ස්ලාගේ ලිස්ට් එක ඇඩ්මින්ට ලබාදෙන API එක (UPDATED WITH ALL FIELDS)
 app.post('/api/admin/players', async (req, res) => {
     const { adminPassword } = req.body;
     if (adminPassword !== "admin123") return res.status(403).json({ message: "Invalid Admin Password!" });
 
     try {
-        // ඔක්කොම ප්ලේයර්ස්ලාව Database එකෙන් ගන්නවා (WhatsApp, Name, Points, Ban status විතරක්)
-        const players = await Player.find({}, 'whatsapp ff_name points isBanned').sort({ points: -1 });
+        // ඔයාගේ Schema එකේ තියෙන ඔක්කොම fields ටික (Password හැර) මෙතනින් ඇදලා ගන්නවා
+        const players = await Player.find({}, 'whatsapp ff_name ff_id points reg_fee registered_at isBanned').sort({ points: -1 });
         res.json(players);
     } catch (err) {
         res.status(500).json({ message: "Database error!" });
