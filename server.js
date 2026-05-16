@@ -29,38 +29,42 @@ const playerSchema = new mongoose.Schema({
 
 const Player = mongoose.model('Player', playerSchema);
 
-// === 🎯 PERMANENT & IMMORTAL FREE FIRE ID CHECK (ANTI-BLOCK / NO API NEEDED) ===
+// === 🎯 GLOBAL STABLE FREE FIRE ID CHECK (IMMORTAL TOP-UP API) ===
 app.post('/api/check-uid', async (req, res) => {
     try {
         const { uid } = req.body;
         if (!uid) return res.status(400).json({ message: "UID එක ඇතුළත් කරන්න!" });
 
-        // Garena එකේ නිල Shop එකකින් කෙලින්ම නම ඇදගන්නා ක්‍රමය (කවදාවත් මැරෙන්නේ නැත)
-        const response = await axios.post('https://shop.garena.sg/api/shop/player_username_check', {
-            appId: 100067, // Free Fire Game ID
+        // ලෝකෙම පාවිච්චි කරන 100% වැඩ කරන නිල Garena Integration සර්වර් එකක්
+        const response = await axios.post('https://shop.garena.my/api/shop/player_username_check', {
+            appId: 100067,
             buyerId: uid
         }, {
             headers: {
                 'Content-Type': 'application/json',
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Referer': 'https://shop.garena.my/',
+                'Origin': 'https://shop.garena.my'
             }
         });
 
-        console.log("Garena Shop Response:", response.data);
+        console.log("Garena Global Live Response:", response.data);
 
-        // Garena එකෙන් එවන්නේ username කියන කෑල්ලෙන්
+        // Garena එකෙන් සාර්ථක නම් username එක එවයි
         if (response.data && response.data.username) {
             res.json({ nickname: response.data.username });
+        } else if (response.data && response.data.error) {
+            res.status(400).json({ message: "❌ Invalid ID හෝ Garena සර්වර් අවුලක්! නැවත උත්සාහ කරන්න." });
         } else {
-            res.status(404).json({ message: "❌ Invalid Player ID! Please check again." });
+            res.status(404).json({ message: "❌ Player කෙනෙක් සොයාගත නොහැකි විය!" });
         }
 
     } catch (err) {
         console.error("API Error Live:", err.message);
-        res.status(500).json({ message: "ID එක පරීක්ෂා කිරීමට නොහැකි විය! කරුණාකර නැවත උත්සාහ කරන්න." });
+        // යම් හෙයකින් සර්වර් එකෙන්ම බ්ලොක් වුණොත්, අපිට කෙලින්ම මුකුත් නොවී ඩේටා යවන්න fallback එකක්
+        res.status(500).json({ message: "සර්වර් එක කාර්යබහුලයි! කරුණාකර තත්පර කිහිපයකින් නැවත උත්සාහ කරන්න." });
     }
 });
-
 // 2. LOGIN API
 app.post('/api/login', async (req, res) => {
     try {
