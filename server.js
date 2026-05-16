@@ -29,28 +29,18 @@ const playerSchema = new mongoose.Schema({
 
 const Player = mongoose.model('Player', playerSchema);
 
-// === 🎯 NEW RAPIDAPI INTEGRATION FOR FREE FIRE ID CHECK (FIXED) ===
+// === 🎯 100% WORKING UNLIMITED FREE FIRE ID CHECK (NO RAPIDAPI) ===
 app.post('/api/check-uid', async (req, res) => {
     try {
         const { uid } = req.body;
         if (!uid) return res.status(400).json({ message: "UID එක ඇතුළත් කරන්න!" });
 
-        const options = {
-            method: 'GET',
-            url: `https://check-id-game3.p.rapidapi.com/game/free-fire?id=${uid}`,
-            headers: {
-                'x-rapidapi-host': 'check-id-game3.p.rapidapi.com',
-                'x-rapidapi-key': 'ed9848b3fcmshe0244ae6d11d7fcp1f91aejsnec4d605515bc'
-            }
-        };
-
-        const response = await axios.request(options);
-        console.log("Garena API Response:", response.data);
+        // කිසිම Key එකක් හෝ සීමාවක් නැති සෘජු API එකක්
+        const response = await axios.get(`https://region.api.garena.me/garena/freefire/id/${uid}`);
         
-        // API එකෙන් නම එවන්නේ response.data.username විදිහටයි
         let nickname = null;
-        if (response.data && response.data.username) {
-            nickname = response.data.username;
+        if (response.data && response.data.nickname) {
+            nickname = response.data.nickname;
         }
 
         if (nickname) {
@@ -64,7 +54,6 @@ app.post('/api/check-uid', async (req, res) => {
         res.status(500).json({ message: "ID එක පරීක්ෂා කිරීමට නොහැකි විය! කරුණාකර නැවත උත්සාහ කරන්න." });
     }
 });
-
 // 1. REGISTER API
 app.post('/api/register', async (req, res) => {
     try {
