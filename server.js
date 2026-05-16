@@ -7,9 +7,24 @@ require('dotenv').config();
 
 const app = express();
 app.use(express.json());
-app.use(cors());
 
+// 🌍 CORS Setup - Network Errors නැති වෙන්නම හැදුවා
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type']
+}));
+
+// 📁 Public Folder Static Link
 app.use(express.static(path.join(__dirname, 'public')));
+
+// === 💾 TOURNAMENT SETTINGS (MEMORY STORAGE) ===
+let tournamentSettings = {
+    nextMatchTime: "2026-05-20T20:30", 
+    liveStatus: "UPCOMING", 
+    matchMessage: "WEEKLY GRAND FINALS: MATCH ROOM IS FORMING SOON!",
+    matchMap: "BERMUDA (CLASSIC)"
+};
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
@@ -29,43 +44,47 @@ const playerSchema = new mongoose.Schema({
 
 const Player = mongoose.model('Player', playerSchema);
 
-// === 💾 PLAYER REGISTRATION ROUTE ===
+// === 💾 1. PLAYER REGISTRATION ROUTE ===
 app.post('/api/register', async (req, res) => {
     try {
-        const { uid, nickname } = req.body;
+        const { whatsapp, password, ff_name, ff_id } = req.body;
 
-        if (!uid || !nickname) {
-            return res.status(400).json({ message: "UID and Nickname are required!" });
+        if (!whatsapp || !password || !ff_name || !ff_id) {
+            return res.status(400).json({ message: "All fields are required! ❌" });
         }
 
-        // 1. එකම UID එකෙන් දෙපාරක් රෙජිස්ටර් වෙන්න බැරි වෙන්න චෙක් කරනවා
-        const existingPlayer = await Player.findOne({ uid: uid });
+        // එකම WhatsApp අංකයකින් දෙපාරක් රෙජිස්ටර් වෙන්න බෑ
+        const existingPlayer = await Player.findOne({ whatsapp: whatsapp });
         if (existingPlayer) {
-            return res.status(400).json({ message: "This Player ID is already registered!" });
+            return res.status(400).json({ message: "This WhatsApp number is already registered! ❌" });
         }
 
-        // 2. අලුත් ප්ලේයර්ව ඩේටාබේස් එකට සේව් කරනවා
-        const newPlayer = new Player({
-            uid: uid,
-            nickname: nickname
-        });
+        // එකම FF ID එකෙන් දෙපාරක් රෙජිස්ටර් වෙන්න බෑ
+        const existingFF = await Player.findOne({ ff_id: ff_id });
+        if (existingFF) {
+            return res.status(400).json({ message: "This Free Fire ID is already registered! ❌" });
+        }
 
+        // අලුත් ප්ලේයර්ව සේව් කිරීම
+        const newPlayer = new Player({ whatsapp, password, ff_name, ff_id });
         await newPlayer.save();
-        res.status(201).json({ message: "Registration Successful!" });
+        
+        res.status(201).json({ message: "Registration Successful! 🔥" });
 
     } catch (error) {
         console.error("Registration Error:", error);
         res.status(500).json({ message: "Server error! Please try again." });
     }
 });
-// 2. LOGIN API
+
+// === 🔐 2. LOGIN API ===
 app.post('/api/login', async (req, res) => {
     try {
         const { whatsapp, password } = req.body;
         const player = await Player.findOne({ whatsapp, password });
 
         if (!player) {
-            return res.status(400).json({ message: "ඇතුළත් කළ දුරකථන අංකය හෝ මුරපදය (Password) වැරදියි!" });
+            return res.status(400).json({ message: "ඇතුළත් කළ දුරකථන අංකය හෝ මුරපදය (Password) වැරදියි! ❌" });
         }
 
         res.json({
@@ -83,50 +102,43 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// 3. LEADERBOARD API
+// === 🏆 3. LEADERBOARD API ===
 app.get('/api/leaderboard', async (req, res) => {
     try {
-        const leaderboard = await Player.find().sort({ points: -1 });
-        res.json(leaderboard);
+        const players = await Player.find().sort({ points: -1 }).limit(10);
+        res.json(players);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-// 4. ADMIN POINTS UPDATE API
-app.post('/api/points', async (req, res) => {
-    try {
-        const { whatsapp, status } = req.body;
-        let pointsToId = 0;
-        if (status === 'win') pointsToId = 10;
-        else if (status === 'defeat') pointsToId = -5;
-
-        const player = await Player.findOne({ whatsapp });
-        if (!player) return res.status(404).json({ message: "Player සොයාගත නොහැකි විය!" });
-
-        player.points += pointsToId;
-        if (player.points < 0) player.points = 0; 
-
-        await player.save();
-        res.json({ message: "Points Updated Successfully!" });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+// === ⚙️ 4. GET SETTINGS API ===
+app.get('/api/settings', (req, res) => {
+    res.json(tournamentSettings);
 });
 
-// 5. WEEKLY RESET API
-app.post('/api/reset-weekly', async (req, res) => {
-    try {
-        await Player.updateMany({}, { $set: { points: 0 } });
-        res.json({ message: "සතිපතා ලකුණු නැවත 0 කරන ලදී!" });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
+// === 🔐 5. UPDATE SETTINGS API (ADMIN ONLY) ===
+app.post('/api/settings/update', (req, res) => {
+    const { adminPassword, nextMatchTime, liveStatus, matchMessage, matchMap } = req.body;
+
+    // ඔයාගේ රහස් Password එක (admin123)
+    if (adminPassword !== "admin123") {
+        return res.status(403).json({ success: false, message: "Wrong Admin Password! ❌" });
     }
+
+    if (nextMatchTime) tournamentSettings.nextMatchTime = nextMatchTime;
+    if (liveStatus) tournamentSettings.liveStatus = liveStatus;
+    if (matchMessage) tournamentSettings.matchMessage = matchMessage;
+    if (matchMap) tournamentSettings.matchMap = matchMap;
+
+    res.json({ success: true, message: "Tournament Settings Updated Successfully! 🔥", settings: tournamentSettings });
 });
 
-            app.get('/sudda', (req, res) => {
+// === 🌐 6. ADMIN HTML ROUTE ===
+app.get('/sudda', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'sudda.html'));
 });
 
+// === 🚀 SERVER LISTEN ===
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
