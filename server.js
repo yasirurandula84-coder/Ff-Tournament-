@@ -16,9 +16,10 @@ mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log("MongoDB Connected..."))
     .catch(err => console.log(err));
 
-// Player Schema
+// Player Schema (Password එක එකතු කරලා තියෙනවා)
 const playerSchema = new mongoose.Schema({
     whatsapp: { type: String, required: true, unique: true },
+    password: { type: String, required: true }, // New Password Field
     ff_name: { type: String, required: true },
     ff_id: { type: String, required: true },
     points: { type: Number, default: 0 },
@@ -28,10 +29,11 @@ const playerSchema = new mongoose.Schema({
 
 const Player = mongoose.model('Player', playerSchema);
 
-// REGISTER API
+// 1. REGISTER API
 app.post('/api/register', async (req, res) => {
     try {
-        const { whatsapp, ff_name, ff_id } = req.body;
+        const { whatsapp, password, ff_name, ff_id } = req.body;
+        
         let existingPlayer = await Player.findOne({ whatsapp });
         if (existingPlayer) return res.status(400).json({ message: "දැනටමත් මේ අංකයෙන් Register වී ඇත!" });
 
@@ -39,11 +41,11 @@ app.post('/api/register', async (req, res) => {
         let fee = 200;
         if (playerCount < 10) fee = 0;
 
-        const newPlayer = new Player({ whatsapp, ff_name, ff_id, reg_fee: fee });
+        const newPlayer = new Player({ whatsapp, password, ff_name, ff_id, reg_fee: fee });
         await newPlayer.save();
 
         res.status(201).json({ 
-            message: fee === 0 ? "සුභ පැතුම්! ඔබ මුල් සාමාජිකයින් 10 දෙනා අතර වේ. ලියාපදිංචිය නොමිලේ!" : "ලියාපදිංචිය සාර්ථකයි! කරුණාකර රු. 200 ක මුදල ගෙවන්න.",
+            message: fee === 0 ? "සුභ පැතුම්! ඔබ මුල් සාමාජිකයින් 10 දෙනා අතර වේ. ලියාපදිංචිය නොමිලේ! දැන් Login වෙන්න." : "ලියාපදිංචිය සාර්ථකයි! කරුණාකර රු. 200 ගෙවා Login වෙන්න.",
             fee: fee
         });
     } catch (err) {
@@ -51,11 +53,68 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-// LEADERBOARD API
+// 2. LOGIN API
+app.post('/api/login', async (req, res) => {
+    try {
+        const { whatsapp, password } = req.body;
+        const player = await Player.findOne({ whatsapp, password });
+
+        if (!player) {
+            return res.status(400).json({ message: "ඇතුළත් කළ දුරකථන අංකය හෝ මුරපදය (Password) වැරදියි!" });
+        }
+
+        res.json({
+            message: "Login Successful",
+            player: {
+                whatsapp: player.whatsapp,
+                ff_name: player.ff_name,
+                ff_id: player.ff_id,
+                points: player.points,
+                reg_fee: player.reg_fee
+            }
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 3. LEADERBOARD API
 app.get('/api/leaderboard', async (req, res) => {
     try {
         const leaderboard = await Player.find().sort({ points: -1 });
         res.json(leaderboard);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 4. ADMIN POINTS UPDATE API (Win / Defeat)
+app.post('/api/points', async (req, res) => {
+    try {
+        const { whatsapp, status } = req.body;
+        let pointsToId = 0;
+        if (status === 'win') pointsToId = 10;
+        else if (status === 'defeat') pointsToId = -5;
+        else return res.status(400).json({ message: "Invalid status." });
+
+        const player = await Player.findOne({ whatsapp });
+        if (!player) return res.status(404).json({ message: "Player සොයාගත නොහැකි විය!" });
+
+        player.points += pointsToId;
+        if (player.points < 0) player.points = 0; 
+
+        await player.save();
+        res.json({ message: "Points Updated Successfully!" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 5. WEEKLY RESET API
+app.post('/api/reset-weekly', async (req, res) => {
+    try {
+        await Player.updateMany({}, { $set: { points: 0 } });
+        res.json({ message: "සතිපතා ලකුණු නැවත 0 කරන ලදී!" });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
