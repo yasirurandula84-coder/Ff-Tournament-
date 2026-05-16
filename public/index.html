@@ -148,6 +148,9 @@
 
             <!-- NAVIGATION LINKS -->
             <nav class="space-y-2 flex-grow">
+                <button onclick="switchTab('home')" id="btn-home" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold text-gray-400 hover:text-white transition-all">
+    <span>🏠</span> Home Dashboard
+</button>
                 <button onclick="switchTab('profile')" id="btn-profile" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold text-gray-400 hover:text-white transition-all menu-active">
                     <span>🎮</span> Player Profile
                 </button>
@@ -180,6 +183,39 @@
             </div>
 
             <!-- ================= TAB CONTENT PAGES ================= -->
+
+            <!-- 🏠 PAGE 0: HOME DASHBOARD TAB -->
+<div id="tab-home" class="tab-page hidden space-y-6">
+    <!-- Welcome Card -->
+    <div class="max-w-3xl bg-gradient-to-r from-orange-600 to-red-600 p-5 rounded-2xl border border-zinc-800 shadow-lg">
+        <h2 class="gaming-font text-xl font-black text-white uppercase">👋 Welcome to Tournament Hub</h2>
+        <p class="text-xs text-white/90 mt-1">ඔබේ ගිණුම සාර්ථකව සම්බන්ධ වී ඇත. තරඟාවලියේ සියලුම විස්තර පහතින් බලන්න.</p>
+    </div>
+
+    <!-- Tournament & Rules Card -->
+    <div class="max-w-3xl gaming-card p-6 rounded-2xl border border-zinc-800/80 shadow-lg backdrop-blur-md">
+        <h3 class="gaming-font text-base font-bold text-orange-500 mb-3 uppercase flex items-center gap-2 border-b border-zinc-900 pb-2">
+            <span>🏆</span> Tournament details & Rules
+        </h3>
+        <ul class="space-y-2 text-xs text-gray-400 list-disc list-inside">
+            <li><b class="text-gray-300">🎮 Game Mode:</b> Free Fire Classic (Mobile Only)</li>
+            <li><b class="text-gray-300">🎟️ Entry Fee:</b> Rs. 200.00 (Top 10 players are free)</li>
+            <li>Hacks, Scripts හෝ 3rd Party App භාවිතය සපුරා තහනම් (🚫 KICK + BAN).</li>
+            <li>තරඟය ආරම්භ වීමට විනාඩි 15කට පෙර ලබා දෙන Room ID එකට එකතු විය යුතුය.</li>
+        </ul>
+    </div>
+
+    <!-- Contact Card -->
+    <div class="max-w-3xl gaming-card p-6 rounded-2xl border border-zinc-800/80 shadow-lg backdrop-blur-md">
+        <h3 class="gaming-font text-base font-bold text-orange-500 mb-3 uppercase flex items-center gap-2 border-b border-zinc-900 pb-2">
+            <span>📞</span> Contact & Support
+        </h3>
+        <div class="space-y-2 text-xs text-gray-400">
+            <p>💬 <b class="text-gray-300">WhatsApp:</b> <a href="https://wa.me/94771234567" target="_blank" class="text-green-400 font-bold hover:underline">+94 77 123 4567</a></p>
+            <p>📧 <b class="text-gray-300">Email Support:</b> <a href="mailto:support@tournament.com" class="text-orange-400 hover:underline">support@tournament.com</a></p>
+        </div>
+    </div>
+</div>
             
             <!-- 📄 PAGE 1: PLAYER PROFILE TAB -->
             <div id="tab-profile" class="tab-page">
@@ -412,7 +448,7 @@
                 }
 
                 updateDashboardUI(playerData);
-                switchTab('profile');
+                switchTab('home');
                 loadLeaderboard();
             } else {
                 document.getElementById('dashboardScreen').classList.add('hidden');
