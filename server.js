@@ -139,6 +139,36 @@ app.get('/sudda', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'sudda.html'));
 });
 
+// 📈 1. ප්ලේයර් කෙනෙක්ගේ Points වෙනස් කිරීමේ API එක
+app.post('/api/admin/update-points', async (req, res) => {
+    const { adminPassword, whatsapp, newPoints } = req.body;
+    if (adminPassword !== "admin123") return res.status(403).json({ message: "Invalid Admin Password!" });
+
+    try {
+        const player = await Player.findOneAndUpdate({ whatsapp }, { points: parseInt(newPoints) }, { new: true });
+        if (!player) return res.status(404).json({ message: "Player not found!" });
+        res.json({ message: `Points updated successfully for ${player.ff_name}!`, player });
+    } catch (err) {
+        res.status(500).json({ message: "Database error!" });
+    }
+});
+
+// 🚫 2. ප්ලේයර් කෙනෙක්ව Ban කිරීම හෝ Unban කිරීමේ API එක
+app.post('/api/admin/toggle-ban', async (req, res) => {
+    const { adminPassword, whatsapp, isBanned } = req.body;
+    if (adminPassword !== "admin123") return res.status(403).json({ message: "Invalid Admin Password!" });
+
+    try {
+        const player = await Player.findOneAndUpdate({ whatsapp }, { isBanned: isBanned }, { new: true });
+        if (!player) return res.status(404).json({ message: "Player not found!" });
+        
+        const statusText = isBanned ? "BANNED 🚫" : "UNBANNED ✅";
+        res.json({ message: `Player ${player.ff_name} has been ${statusText}!` });
+    } catch (err) {
+        res.status(500).json({ message: "Database error!" });
+    }
+});
+
 // === 🚀 SERVER LISTEN ===
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
