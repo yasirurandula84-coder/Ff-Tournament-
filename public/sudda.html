@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FF HUB - ADMIN PANEL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: radial-gradient(circle at center, #111 0%, #050505 100%);
+        }
+        .gaming-font { font-family: 'Orbitron', sans-serif; }
+        .neon-border { box-shadow: 0 0 20px rgba(249, 115, 22, 0.2); border: 1px solid rgba(249, 115, 22, 0.4); }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen justify-center items-center px-4 text-gray-100">
+
+    <div class="w-full max-w-md bg-black/80 p-8 rounded-2xl neon-border backdrop-blur-md">
+        <div class="text-center mb-6">
+            <h1 class="gaming-font text-2xl font-black text-orange-500 uppercase tracking-wider">
+                ⚙️ HUB CONTROLLER
+            </h1>
+            <p class="text-xs text-gray-500 uppercase tracking-widest mt-1">Official Tournament Administration</p>
+        </div>
+
+        <form id="adminForm" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Secret Admin Password</label>
+                <input type="password" id="admin_pass" placeholder="Enter secret key..." required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Next Match Date & Time</label>
+                <input type="datetime-local" id="admin_time" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Live Match Status</label>
+                <select id="admin_status" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500">
+                    <option value="LIVE">LIVE NOW 🔴</option>
+                    <option value="UPCOMING">UPCOMING ⏳</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Ticker Alert Message</label>
+                <input type="text" id="admin_msg" placeholder="e.g. GRAND FINALS IS STARTING SOON!" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Match Map</label>
+                <input type="text" id="admin_map" placeholder="e.g. BERMUDA (CLASSIC)" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500">
+            </div>
+            
+            <button type="submit" id="adminBtn" class="w-full gaming-font bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 text-white font-black py-3 rounded-lg text-sm uppercase tracking-wider transition-all shadow-lg shadow-orange-900/20">
+                Update Live Dashboard
+            </button>
+        </form>
+        
+        <p id="adminMessage" class="mt-4 text-center text-xs font-semibold hidden"></p>
+    </div>
+
+    <script>
+        // 🚀 Render එකේ ලින්ක් එක මෙතනට දාන්න මල්ලි
+        const API_URL = "https://ff-tournament-k4gk.onrender.com";
+
+        // සයිට් එක ලෝඩ් වෙද්දීම දැනට සර්වර් එකේ තියෙන විස්තර ටික auto පිරෙන්න හැදුවා (ලේසි වෙන්න)
+        window.onload = async function() {
+            try {
+                const response = await fetch(`${API_URL}/api/settings`);
+                const settings = await response.json();
+                
+                document.getElementById('admin_time').value = settings.nextMatchTime;
+                document.getElementById('admin_status').value = settings.liveStatus;
+                document.getElementById('admin_msg').value = settings.matchMessage;
+                document.getElementById('admin_map').value = settings.matchMap;
+            } catch (error) { console.error("Error loading current settings"); }
+        };
+
+        // දත්ත සර්වර් එකට යවන කොටස
+        document.getElementById('adminForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('adminBtn');
+            const msgEl = document.getElementById('adminMessage');
+
+            const adminPassword = document.getElementById('admin_pass').value;
+            const nextMatchTime = document.getElementById('admin_time').value;
+            const liveStatus = document.getElementById('admin_status').value;
+            const matchMessage = document.getElementById('admin_msg').value.trim();
+            const matchMap = document.getElementById('admin_map').value.trim();
+
+            btn.disabled = true;
+            btn.innerText = "Transmitting Data...";
+
+            try {
+                const response = await fetch(`${API_URL}/api/settings/update`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ adminPassword, nextMatchTime, liveStatus, matchMessage, matchMap })
+                });
+                const data = await response.json();
+
+                if(response.ok) {
+                    msgEl.className = "mt-4 text-center text-xs font-semibold block text-green-400 bg-green-500/10 p-3 rounded-lg border border-green-500/20";
+                    msgEl.innerText = data.message;
+                    document.getElementById('admin_pass').value = ''; // password එක විතරක් ක්ලියර් කරනවා
+                } else {
+                    msgEl.className = "mt-4 text-center text-xs font-semibold block text-red-400 bg-red-500/10 p-3 rounded-lg border border-red-500/20";
+                    msgEl.innerText = data.message;
+                }
+            } catch (error) { 
+                msgEl.className = "mt-4 text-center text-xs font-semibold block text-red-400 bg-red-500/10 p-3 rounded-lg";
+                msgEl.innerText = "Network Error!"; 
+            }
+            finally { btn.disabled = false; btn.innerText = "Update Live Dashboard"; }
+        });
+    </script>
+</body>
+</html>
