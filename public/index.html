@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FREE FIRE TOURNAMENT HUB</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght=400;700;900&family=Rajdhani:wght=500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Rajdhani', sans-serif;
@@ -44,16 +44,15 @@
             box-shadow: inset 0 0 10px rgba(249, 115, 22, 0.2), 0 0 10px rgba(249, 115, 22, 0.2);
         }
 
-        /* Active Tab Navigation Style */
-        .active-tab {
-            background-color: #f97316;
-            color: #000;
-            font-weight: 900;
-            box-shadow: 0 0 15px rgba(249, 115, 22, 0.4);
+        /* Active Menu Styling */
+        .menu-active {
+            background: linear-gradient(90deg, rgba(249,115,22,0.15) 0%, rgba(0,0,0,0) 100%);
+            border-left: 4px solid #f97316;
+            color: #f97316 !important;
         }
     </style>
 </head>
-<body class="flex flex-col min-h-screen justify-between text-gray-100">
+<body class="flex flex-col min-h-screen text-gray-100">
 
     <!-- ================= AUTH SCREEN ================= -->
     <div id="authScreen" class="flex-grow flex flex-col items-center justify-center px-4 py-12">
@@ -131,111 +130,94 @@
     </div>
 
 
-    <!-- ================= DASHBOARD SCREEN ================= -->
-    <div id="dashboardScreen" class="hidden flex-grow">
-        <header class="py-5 px-4 border-b border-zinc-900 bg-black/50 backdrop-blur-md sticky top-0 z-50">
-            <div class="max-w-7xl mx-auto w-full flex flex-col md:flex-row justify-between items-center gap-4">
-                <h1 class="gaming-font text-xl md:text-2xl font-black tracking-wider text-orange-500 neon-text uppercase">HUB MAINBOARD</h1>
-                
-                <!-- 🌐 NAVIGATION MENU -->
-                <nav class="flex bg-zinc-950 border border-zinc-800 p-1 rounded-xl gaming-font text-xs uppercase tracking-wider">
-                    <button onclick="switchTab('home')" id="tab-home" class="px-4 py-2 rounded-lg text-gray-400 hover:text-white font-bold transition-all duration-300">Home</button>
-                    <button onclick="switchTab('dashboard')" id="tab-dashboard" class="px-4 py-2 rounded-lg text-gray-400 hover:text-white font-bold transition-all duration-300">Dashboard</button>
-                    <button onclick="switchTab('leaderboard')" id="tab-leaderboard" class="px-4 py-2 rounded-lg text-gray-400 hover:text-white font-bold transition-all duration-300">Leaderboard</button>
-                    <button onclick="switchTab('profile')" id="tab-profile" class="px-4 py-2 rounded-lg text-gray-400 hover:text-white font-bold transition-all duration-300">Profile</button>
-                </nav>
+    <!-- ================= DASHBOARD SCREEN WITH SIDE NAVIGATION ================= -->
+    <div id="dashboardScreen" class="hidden flex-grow flex flex-col md:flex-row min-h-screen">
+        
+        <!-- 🧭 MOBILE TOP BAR -->
+        <div class="md:hidden flex justify-between items-center bg-zinc-950/90 p-4 border-b border-zinc-900">
+            <h1 class="gaming-font text-lg font-black text-orange-500 tracking-wider">HUB BOARD</h1>
+            <button onclick="toggleMobileMenu()" class="text-2xl text-orange-500 focus:outline-none">☰</button>
+        </div>
 
-                <button onclick="logout()" class="gaming-font text-xs bg-red-600 hover:bg-red-500 text-white font-bold px-4 py-2 rounded uppercase tracking-wide transition-all">Logout 🚪</button>
+        <!-- 🛡️ NAVIGATION SIDEBAR (LEFT) -->
+        <aside id="sidebar" class="hidden md:flex flex-col w-full md:w-64 bg-black/80 md:bg-zinc-950/60 border-b md:border-b-0 md:border-r border-zinc-900 backdrop-blur-md p-5 shrink-0 transition-all z-50">
+            <div class="hidden md:block mb-8 text-center border-b border-zinc-900 pb-4">
+                <h1 class="gaming-font text-xl font-black tracking-wider text-orange-500 neon-text uppercase">HUB PANEL</h1>
+                <p class="text-[10px] text-gray-500 uppercase tracking-widest mt-0.5">Control Terminal</p>
             </div>
-        </header>
 
-        <!-- 📡 LIVE MATCH TICKER PANEL -->
-        <div class="max-w-7xl mx-auto px-4 mt-6">
-            <div class="bg-zinc-950/60 border border-zinc-900 rounded-xl p-3 flex flex-wrap items-center justify-between gap-4">
+            <!-- NAVIGATION LINKS -->
+            <nav class="space-y-2 flex-grow">
+                <button onclick="switchTab('profile')" id="btn-profile" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold text-gray-400 hover:text-white transition-all menu-active">
+                    <span>🎮</span> Player Profile
+                </button>
+                <button onclick="switchTab('leaderboard')" id="btn-leaderboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold text-gray-400 hover:text-white transition-all">
+                    <span>🏆</span> Standings & Ranks
+                </button>
+                <button onclick="switchTab('payments')" id="btn-payments" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold text-gray-400 hover:text-white transition-all">
+                    <span>💳</span> Entry Fee Payment
+                </button>
+            </nav>
+
+            <!-- LOGOUT BUTTON AT BOTTOM -->
+            <div class="pt-4 border-t border-zinc-900 mt-4 md:mt-0">
+                <button onclick="logout()" class="w-full gaming-font text-xs bg-red-600/20 hover:bg-red-600 border border-red-600/40 text-red-400 hover:text-white font-bold px-4 py-3 rounded-lg uppercase tracking-wide transition-all flex items-center justify-center gap-2">
+                    <span>🚪</span> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- 📡 RIGHT MAIN CONTENT CONTAINER -->
+        <div class="flex-grow flex flex-col p-4 md:p-8 overflow-y-auto w-full">
+            
+            <!-- LIVE MATCH TICKER PANEL (ALWAYS TOP) -->
+            <div class="w-full bg-zinc-950/60 border border-zinc-900 rounded-xl p-3 flex flex-wrap items-center justify-between gap-4 mb-6">
                 <div class="flex items-center gap-3">
                     <span id="liveBadge" class="bg-red-600 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded blink-animation">LIVE</span>
                     <p id="liveMatchMessage" class="text-xs md:text-sm text-gray-300 font-medium tracking-wide">Loading match details...</p>
                 </div>
                 <div id="liveMatchMap" class="text-xs text-gray-500 font-semibold uppercase">MAP: --</div>
             </div>
-        </div>
 
-        <!-- MAIN DYNAMIC CONTENT CONTAINER -->
-        <div class="max-w-7xl mx-auto px-4 mt-6 pb-12">
+            <!-- ================= TAB CONTENT PAGES ================= -->
             
-            <!-- 🏠 1. HOME TAB CONTENT -->
-            <div id="content-home" class="tab-content space-y-6">
-                <div class="bg-gradient-to-r from-orange-600/20 to-red-600/10 border border-orange-500/30 p-8 rounded-2xl backdrop-blur-md">
-                    <h2 class="gaming-font text-2xl font-black text-orange-500 mb-2 uppercase">💥 WELCOME TO TOURNAMENT ARENA</h2>
-                    <p class="text-sm text-gray-300 max-w-2xl leading-relaxed">මෙම ප්ලේයර් පැනලය හරහා ඔබට ඉදිරි තරඟ වටවල විස්තර සජීවීව බලාගත හැක. නීති විරෝධී ලෙස ක්‍රීඩා කරන ක්‍රීඩකයින් පද්ධතියෙන් ස්වයංක්‍රීයව ඉවත් කරනු ලැබේ.</p>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-zinc-950/80 p-5 rounded-xl border border-zinc-900">
-                        <h3 class="font-bold text-orange-500 uppercase mb-2">📌 තරඟ නීති (Rules)</h3>
-                        <ul class="text-xs text-gray-400 space-y-2 list-disc pl-4">
-                            <li>Hacks, Scripts හෝ Config files භාවිතය සම්පූර්ණයෙන් තහනම්.</li>
-                            <li>තරඟය ආරම්භ වීමට විනාඩි 15කට පෙර Room එකට ඇතුල් විය යුතුය.</li>
-                            <li>ලියාපදිංචි වූ UID එකෙන් පමණක් තරඟයට සහභාගී වන්න.</li>
-                        </ul>
-                    </div>
-                    <div class="bg-zinc-950/80 p-5 rounded-xl border border-zinc-900 flex flex-col justify-between">
-                        <div>
-                            <h3 class="font-bold text-orange-500 uppercase mb-2">📞 OFFICIAL SUPPORT</h3>
-                            <p class="text-xs text-gray-400">කිසියම් ගැටළුවක් ඇත්නම් අපගේ නිල WhatsApp සමූහය හරහා Admin සම්බන්ධ කරගන්න.</p>
+            <!-- 📄 PAGE 1: PLAYER PROFILE TAB -->
+            <div id="tab-profile" class="tab-page">
+                <div class="max-w-3xl gaming-card p-6 rounded-2xl border border-zinc-800/80 shadow-lg backdrop-blur-md">
+                    <h2 class="gaming-font text-lg font-bold text-orange-500 mb-4 border-b border-zinc-800 pb-2 uppercase flex items-center gap-2">
+                        <span>🎮 PLAYER STATUS PROFILE</span>
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div class="flex justify-between border-b border-zinc-900/60 pb-3">
+                            <span class="text-gray-400 flex items-center gap-1.5">👤 In-Game Name:</span> 
+                            <b id="dashName" class="text-white text-base font-bold">--</b>
                         </div>
-                        <a href="https://chat.whatsapp.com/ඔයාගේ_ගෲප්_ලින්ක්_එක" target="_blank" class="mt-4 text-center gaming-font text-xs bg-green-600 hover:bg-green-500 py-2.5 rounded font-bold uppercase tracking-wider block">Contact Admin via WhatsApp</a>
+                        <div class="flex justify-between border-b border-zinc-900/60 pb-3">
+                            <span class="text-gray-400 flex items-center gap-1.5">🆔 Account UID:</span> 
+                            <b id="dashID" class="text-white tracking-wider">--</b>
+                        </div>
+                        <div class="flex justify-between border-b border-zinc-900/60 pb-3">
+                            <span class="text-gray-400 flex items-center gap-1.5">🔥 Current Points:</span> 
+                            <b id="dashPoints" class="text-orange-500 text-2xl font-black gaming-font neon-text">0</b>
+                        </div>
+                        <div class="flex justify-between border-b border-zinc-900/60 pb-3">
+                            <span class="text-gray-400 flex items-center gap-1.5">🎟️ Room Slot Status:</span> 
+                            <b id="dashFee" class="text-white">--</b>
+                        </div>
+                    </div>
+                    <div class="mt-8 pt-4 border-t border-zinc-900 max-w-sm mx-auto text-center">
+                        <p class="text-xs text-gray-400 mb-2">👇 Connect to Official Match Communication Hub</p>
+                        <a href="https://chat.whatsapp.com/ඔයාගේ_ගෲප්_ලින්ක්_එක" target="_blank" class="block gaming-font bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg text-sm uppercase tracking-wider transition-all shadow-md">💬 Join WhatsApp Group</a>
                     </div>
                 </div>
             </div>
 
-            <!-- 📊 2. DASHBOARD TAB CONTENT -->
-            <div id="content-dashboard" class="tab-content hidden grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div class="lg:col-span-1 space-y-6">
-                    <div class="gaming-card p-6 rounded-2xl border border-zinc-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.4)] backdrop-blur-md">
-                        <h2 class="gaming-font text-base font-bold text-orange-500 mb-4 border-b border-zinc-800 pb-2 uppercase">🎮 DASH OVERVIEW</h2>
-                        <div class="space-y-4 text-sm">
-                            <div class="flex justify-between border-b border-zinc-900/60 pb-2">
-                                <span class="text-gray-400">👤 Name:</span> <b class="text-white user-name-placeholder">--</b>
-                            </div>
-                            <div class="flex justify-between border-b border-zinc-900/60 pb-2">
-                                <span class="text-gray-400">🔥 Points:</span> <b class="text-orange-500 font-black gaming-font user-points-placeholder">0</b>
-                            </div>
-                            <div class="flex justify-between border-b border-zinc-900/60 pb-2">
-                                <span class="text-gray-400">🎟️ Slot Fee:</span> <b class="user-fee-placeholder">--</b>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 💳 PAYMENT DETAILS CARD -->
-                    <div id="dashPaymentSection" class="hidden bg-zinc-950/90 p-5 rounded-2xl border border-orange-500/30">
-                        <h2 class="gaming-font text-xs font-bold text-orange-500 mb-3 uppercase flex items-center gap-2">
-                            <span class="animate-pulse text-red-500">⚡</span> <span>Tournament Fee Payment</span>
-                        </h2>
-                        <div class="space-y-3 text-xs">
-                            <div class="bg-black/40 p-3 rounded-lg border border-zinc-800/80">
-                                <p class="text-orange-400 font-bold mb-1 uppercase">📱 eZ Cash / M Cash</p>
-                                <p class="text-gray-300 font-mono tracking-wider payment-ezcash-placeholder">Loading...</p>
-                            </div>
-                            <div class="bg-black/40 p-3 rounded-lg border border-zinc-800/80">
-                                <p class="text-orange-400 font-bold mb-1 uppercase">🏦 Bank Transfer Details</p>
-                                <p class="text-gray-300 font-mono leading-relaxed whitespace-pre-line payment-bank-placeholder">Loading...</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="lg:col-span-2 bg-zinc-950/40 p-6 border border-zinc-900 rounded-2xl flex flex-col justify-center items-center text-center">
-                    <p class="text-orange-500 text-3xl mb-2">🚀</p>
-                    <h3 class="gaming-font font-bold text-lg text-white mb-2 uppercase">Your Match Platform is Ready</h3>
-                    <p class="text-xs text-gray-400 max-w-sm">ඔබේ වත්මන් ලකුණු මට්ටම් සහ ශ්‍රේණිගත කිරීම් බලාගැනීමට කරුණාකර 'Leaderboard' ටැබ් එක වෙත හෝ ඔබේ සම්පූර්ණ ගිණුම් විස්තර සඳහා 'Profile' ටැබ් එක වෙත යන්න.</p>
-                </div>
-            </div>
-
-            <!-- 🏆 3. LEADERBOARD TAB CONTENT -->
-            <div id="content-leaderboard" class="tab-content hidden">
-                <div class="bg-black/60 p-6 rounded-2xl neon-border backdrop-blur-md min-h-[450px]">
+            <!-- 🏆 PAGE 2: LEADERBOARD STANDINGS TAB -->
+            <div id="tab-leaderboard" class="tab-page hidden">
+                <div class="w-full bg-black/60 p-6 rounded-2xl neon-border backdrop-blur-md min-h-[450px]">
                     <div class="flex justify-between items-center mb-5 border-b border-zinc-800 pb-2">
                         <h2 class="gaming-font text-base md:text-lg font-black text-red-500 uppercase tracking-wide">🏆 TOURNAMENT STANDINGS</h2>
-                        <button onclick="loadLeaderboard()" class="text-xs bg-zinc-950 hover:bg-zinc-900 px-3 py-1.5 rounded-md text-gray-400 border border-zinc-800 transition-all">🔄 Refresh Table</button>
+                        <button onclick="loadLeaderboard()" class="text-xs bg-zinc-950 hover:bg-zinc-900 px-3 py-1.5 rounded-md text-gray-400 border border-zinc-800 transition-all">🔄 Refresh Standings</button>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
@@ -255,47 +237,22 @@
                 </div>
             </div>
 
-            <!-- 👤 4. PROFILE TAB CONTENT -->
-            <div id="content-profile" class="tab-content hidden max-w-2xl mx-auto">
-                <div class="bg-zinc-950/90 border border-zinc-800/80 p-8 rounded-2xl shadow-xl space-y-6">
-                    <div class="flex items-center gap-4 border-b border-zinc-900 pb-4">
-                        <div class="w-16 h-16 bg-gradient-to-tr from-orange-600 to-red-600 rounded-full flex items-center justify-center text-2xl font-black text-black uppercase shadow-lg shadow-orange-500/20 gaming-font">
-                            FF
-                        </div>
-                        <div>
-                            <h2 class="gaming-font text-xl font-bold text-white uppercase user-name-placeholder">--</h2>
-                            <p class="text-xs text-orange-500 font-bold uppercase tracking-wider">Verified Tournament Player</p>
-                        </div>
-                    </div>
+            <!-- 💳 PAGE 3: PAYMENTS TAB -->
+            <div id="tab-payments" class="tab-page hidden">
+                <div class="max-w-xl bg-zinc-950/90 p-6 rounded-2xl border border-orange-500/30 shadow-md backdrop-blur-md">
+                    <h2 class="gaming-font text-base font-bold text-orange-500 mb-3 uppercase tracking-wider flex items-center gap-2">
+                        <span class="animate-pulse text-red-500">⚡</span> <span>Tournament Fee Gate</span>
+                    </h2>
+                    <p id="feeGateMessage" class="text-xs text-gray-400 mb-4 leading-relaxed">ගෙවීම් සිදුකර WhatsApp සමූහයට රිසිට්පත යොමු කරන්න.</p>
                     
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                        <div class="bg-black/40 p-4 rounded-xl border border-zinc-900/60">
-                            <span class="block text-xs text-gray-500 uppercase mb-0.5">In-Game Nickname</span>
-                            <span class="font-bold text-white user-name-placeholder">--</span>
+                    <div id="paymentMethodsContainer" class="space-y-4 text-sm">
+                        <div class="bg-black/40 p-4 rounded-lg border border-zinc-800/80">
+                            <p class="text-orange-400 font-bold mb-1 uppercase tracking-wide text-xs">📱 eZ Cash / M Cash</p>
+                            <p class="text-gray-300 font-mono text-base tracking-wider" id="paymentEzCash">Loading...</p>
                         </div>
-                        <div class="bg-black/40 p-4 rounded-xl border border-zinc-900/60">
-                            <span class="block text-xs text-gray-500 uppercase mb-0.5">Free Fire UID</span>
-                            <span class="font-mono font-bold text-white tracking-wider user-id-placeholder">--</span>
-                        </div>
-                        <div class="bg-black/40 p-4 rounded-xl border border-zinc-900/60">
-                            <span class="block text-xs text-gray-500 uppercase mb-0.5">WhatsApp Number</span>
-                            <span class="font-bold text-white user-whatsapp-placeholder">--</span>
-                        </div>
-                        <div class="bg-black/40 p-4 rounded-xl border border-zinc-900/60">
-                            <span class="block text-xs text-gray-500 uppercase mb-0.5">Ranked Points</span>
-                            <span class="font-bold text-orange-500 gaming-font text-lg user-points-placeholder">0</span>
-                        </div>
-                        <div class="bg-black/40 p-4 rounded-xl border border-zinc-900/60 sm:col-span-2">
-                            <span class="block text-xs text-gray-500 uppercase mb-0.5">Entry Ticket Status</span>
-                            <span class="font-bold user-fee-placeholder">--</span>
-                        </div>
-                    </div>
-
-                    <div id="profilePaymentSection" class="hidden pt-2">
-                        <h3 class="text-xs font-bold text-orange-500 uppercase mb-3 tracking-wider">💳 Complete Your Payment</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                            <div class="bg-black/60 p-3 rounded-lg border border-zinc-900"><p class="text-orange-400 font-bold mb-1">📱 eZ Cash</p><p class="text-gray-300 font-mono payment-ezcash-placeholder">Loading...</p></div>
-                            <div class="bg-black/60 p-3 rounded-lg border border-zinc-900"><p class="text-orange-400 font-bold mb-1">🏦 Bank Transfer</p><p class="text-gray-300 font-mono leading-relaxed whitespace-pre-line payment-bank-placeholder">Loading...</p></div>
+                        <div class="bg-black/40 p-4 rounded-lg border border-zinc-800/80">
+                            <p class="text-orange-400 font-bold mb-1 uppercase tracking-wide text-xs">🏦 Bank Transfer Details</p>
+                            <p class="text-gray-300 font-mono text-xs leading-relaxed whitespace-pre-line" id="paymentBank">Loading...</p>
                         </div>
                     </div>
                 </div>
@@ -305,20 +262,32 @@
     </div>
 
     <!-- ========================================================= -->
-    <!--                    🎮 JAVASCRIPT LOGIC                      -->
+    <!--                       JAVASCRIPT LOGIC                     -->
     <!-- ========================================================= -->
     <script>
         const API_URL = "https://ff-tournament-k4gk.onrender.com";
         let countdownInterval = null;
 
+        // === 🗂️ TAB SWITCHER SYSTEM ===
         function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`content-${tabId}`).classList.remove('hidden');
+            // Hide all pages
+            document.querySelectorAll('.tab-page').forEach(page => page.classList.add('hidden'));
+            // Show requested page
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
 
-            ['home', 'dashboard', 'leaderboard', 'profile'].forEach(id => {
-                document.getElementById(`tab-${id}`).className = "px-4 py-2 rounded-lg text-gray-400 hover:text-white font-bold transition-all duration-300";
-            });
-            document.getElementById(`tab-${tabId}`).classList.add('active-tab');
+            // Manage nav button statuses
+            document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('menu-active'));
+            document.getElementById(`btn-${tabId}`).classList.add('menu-active');
+
+            // Close mobile menu layout if open
+            if(window.innerWidth < 768) {
+                document.getElementById('sidebar').classList.add('hidden');
+            }
+        }
+
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('hidden');
         }
 
         function updateLiveCountdown(targetTimeStr) {
@@ -357,8 +326,8 @@
                 document.getElementById('liveMatchMessage').innerText = settings.matchMessage;
                 document.getElementById('liveMatchMap').innerText = `MAP: ${settings.matchMap}`;
 
-                document.querySelectorAll('.payment-ezcash-placeholder').forEach(el => el.innerText = settings.ezCashNumber || '--');
-                document.querySelectorAll('.payment-bank-placeholder').forEach(el => el.innerText = settings.bankDetails || '--');
+                if (settings.ezCashNumber) document.getElementById('paymentEzCash').innerText = settings.ezCashNumber;
+                if (settings.bankDetails) document.getElementById('paymentBank').innerText = settings.bankDetails;
 
                 const badge = document.getElementById('liveBadge');
                 badge.innerText = settings.liveStatus;
@@ -390,31 +359,9 @@
                     }
 
                     localStorage.setItem('ff_player', JSON.stringify(playerData));
-                    updateUIPlaceholders(playerData);
+                    updateDashboardUI(playerData);
                 }
-            } catch (error) { console.error("Error updating player status:", error); }
-        }
-
-        function updateUIPlaceholders(playerData) {
-            if (!playerData) return;
-            document.querySelectorAll('.user-name-placeholder').forEach(el => el.innerText = playerData.ff_name || '--');
-            document.querySelectorAll('.user-id-placeholder').forEach(el => el.innerText = playerData.ff_id || '--');
-            document.querySelectorAll('.user-whatsapp-placeholder').forEach(el => el.innerText = playerData.whatsapp || '--');
-            document.querySelectorAll('.user-points-placeholder').forEach(el => el.innerText = playerData.points !== undefined ? playerData.points : '0');
-            
-            document.querySelectorAll('.user-fee-placeholder').forEach(el => {
-                if (playerData.reg_fee === 0) {
-                    el.innerText = "FREE (Top 10)";
-                    el.className = "text-green-400 font-bold";
-                    document.getElementById('dashPaymentSection').classList.add('hidden');
-                    document.getElementById('profilePaymentSection').classList.add('hidden');
-                } else {
-                    el.innerText = "Rs. 200.00";
-                    el.className = "text-yellow-500 font-bold";
-                    document.getElementById('dashPaymentSection').classList.remove('hidden');
-                    document.getElementById('profilePaymentSection').classList.remove('hidden');
-                }
-            });
+            } catch (error) { console.error("Error checking player ban status:", error); }
         }
 
         function switchAuth(showLogin) {
@@ -429,16 +376,47 @@
             if(savedPlayer) { switchToScreen(true, savedPlayer); } else { switchToScreen(false); }
         }
 
+        function updateDashboardUI(playerData) {
+            document.getElementById('dashName').innerText = playerData.ff_name;
+            document.getElementById('dashID').innerText = playerData.ff_id;
+            document.getElementById('dashPoints').innerText = playerData.points;
+            
+            const feeGateMsg = document.getElementById('feeGateMessage');
+            const gatewayContainer = document.getElementById('paymentMethodsContainer');
+
+            if (playerData.reg_fee === 0) {
+                document.getElementById('dashFee').innerText = "FREE (Top 10)";
+                document.getElementById('dashFee').className = "text-green-400 font-bold";
+                
+                // Hide payment methods & update notice
+                feeGateMsg.innerText = "🎉 You are verified as a FREE entry slot player. Payment credentials locked.";
+                gatewayContainer.classList.add('hidden');
+            } else {
+                document.getElementById('dashFee').innerText = "Rs. 200.00";
+                document.getElementById('dashFee').className = "text-yellow-500 font-bold";
+                
+                // Show payment layouts
+                feeGateMsg.innerText = "ගෙවීම් සිදුකර WhatsApp සමූහයට رිසිට්පත යොමු කරන්න.";
+                gatewayContainer.classList.remove('hidden');
+            }
+        }
+
         function switchToScreen(isDashboard, playerData = null) {
             if(isDashboard && playerData) {
                 document.getElementById('authScreen').classList.add('hidden');
                 document.getElementById('dashboardScreen').classList.remove('hidden');
                 
-                updateUIPlaceholders(playerData);
-                switchTab('home'); 
+                // Handle dynamic layout for grid view vs sidebar
+                if(window.innerWidth >= 768) {
+                    document.getElementById('sidebar').classList.remove('hidden');
+                }
+
+                updateDashboardUI(playerData);
+                switchTab('profile');
                 loadLeaderboard();
             } else {
                 document.getElementById('dashboardScreen').classList.add('hidden');
+                document.getElementById('sidebar').classList.add('hidden');
                 document.getElementById('authScreen').classList.remove('hidden');
                 switchAuth(true);
             }
@@ -578,6 +556,16 @@
             checkSession();
             fetchTournamentSettings(); 
             
+            // Watch windows dimensions for desktop vs mobile toggle
+            window.addEventListener('resize', () => {
+                const sidebar = document.getElementById('sidebar');
+                if(window.innerWidth >= 768 && document.getElementById('dashboardScreen').classList.contains('hidden') === false) {
+                    sidebar.classList.remove('hidden');
+                } else if(window.innerWidth < 768) {
+                    sidebar.classList.add('hidden');
+                }
+            });
+
             setInterval(fetchTournamentSettings, 10000); 
             setInterval(checkCurrentPlayerStatus, 10000); 
         };
