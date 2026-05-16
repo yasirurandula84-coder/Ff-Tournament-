@@ -29,40 +29,33 @@ const playerSchema = new mongoose.Schema({
 
 const Player = mongoose.model('Player', playerSchema);
 
-// === 🎯 GLOBAL STABLE FREE FIRE ID CHECK (IMMORTAL TOP-UP API) ===
-app.post('/api/check-uid', async (req, res) => {
+// === 💾 PLAYER REGISTRATION ROUTE ===
+app.post('/api/register', async (req, res) => {
     try {
-        const { uid } = req.body;
-        if (!uid) return res.status(400).json({ message: "UID එක ඇතුළත් කරන්න!" });
+        const { uid, nickname } = req.body;
 
-        // ලෝකෙම පාවිච්චි කරන 100% වැඩ කරන නිල Garena Integration සර්වර් එකක්
-        const response = await axios.post('https://shop.garena.my/api/shop/player_username_check', {
-            appId: 100067,
-            buyerId: uid
-        }, {
-            headers: {
-                'Content-Type': 'application/json',
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                'Referer': 'https://shop.garena.my/',
-                'Origin': 'https://shop.garena.my'
-            }
-        });
-
-        console.log("Garena Global Live Response:", response.data);
-
-        // Garena එකෙන් සාර්ථක නම් username එක එවයි
-        if (response.data && response.data.username) {
-            res.json({ nickname: response.data.username });
-        } else if (response.data && response.data.error) {
-            res.status(400).json({ message: "❌ Invalid ID හෝ Garena සර්වර් අවුලක්! නැවත උත්සාහ කරන්න." });
-        } else {
-            res.status(404).json({ message: "❌ Player කෙනෙක් සොයාගත නොහැකි විය!" });
+        if (!uid || !nickname) {
+            return res.status(400).json({ message: "UID and Nickname are required!" });
         }
 
-    } catch (err) {
-        console.error("API Error Live:", err.message);
-        // යම් හෙයකින් සර්වර් එකෙන්ම බ්ලොක් වුණොත්, අපිට කෙලින්ම මුකුත් නොවී ඩේටා යවන්න fallback එකක්
-        res.status(500).json({ message: "සර්වර් එක කාර්යබහුලයි! කරුණාකර තත්පර කිහිපයකින් නැවත උත්සාහ කරන්න." });
+        // 1. එකම UID එකෙන් දෙපාරක් රෙජිස්ටර් වෙන්න බැරි වෙන්න චෙක් කරනවා
+        const existingPlayer = await Player.findOne({ uid: uid });
+        if (existingPlayer) {
+            return res.status(400).json({ message: "This Player ID is already registered!" });
+        }
+
+        // 2. අලුත් ප්ලේයර්ව ඩේටාබේස් එකට සේව් කරනවා
+        const newPlayer = new Player({
+            uid: uid,
+            nickname: nickname
+        });
+
+        await newPlayer.save();
+        res.status(201).json({ message: "Registration Successful!" });
+
+    } catch (error) {
+        console.error("Registration Error:", error);
+        res.status(500).json({ message: "Server error! Please try again." });
     }
 });
 // 2. LOGIN API
