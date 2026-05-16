@@ -31,7 +31,7 @@ mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log("MongoDB Connected..."))
     .catch(err => console.log(err));
 
-// Player Schema
+// === 💾 PLAYER SCHEMA (UPDATED WITH PAYMENT FIELDS) ===
 const playerSchema = new mongoose.Schema({
     whatsapp: { type: String, required: true, unique: true },
     password: { type: String, required: true },
@@ -39,12 +39,15 @@ const playerSchema = new mongoose.Schema({
     ff_id: { type: String, required: true },
     points: { type: Number, default: 0 },
     reg_fee: { type: Number, default: 200 },
-    registered_at: { type: Date, default: Date.now }
+    registered_at: { type: Date, default: Date.now },
+    isBanned: { type: Boolean, default: false }, // Admin panel එකට අවශ්‍ය නිසා Schema එකටම දැම්මා
+    payment_slip: { type: String, default: "" },   // 🆕 රිසිට් එකේ ලින්ක් එක සේව් වෙන්න
+    payment_status: { type: String, default: "Pending" } // 🆕 Pending, Approved, Free
 });
 
 const Player = mongoose.model('Player', playerSchema);
 
-// === 💾 1. PLAYER REGISTRATION ROUTE ===
+// === 💾 1. PLAYER REGISTRATION ROUTE (FIRST 10 FREE LOGIC) ===
 app.post('/api/register', async (req, res) => {
     try {
         const { whatsapp, password, ff_name, ff_id } = req.body;
@@ -65,11 +68,33 @@ app.post('/api/register', async (req, res) => {
             return res.status(400).json({ message: "This Free Fire ID is already registered! ❌" });
         }
 
-        // අලුත් ප්ලේයර්ව සේව් කිරීම
-        const newPlayer = new Player({ whatsapp, password, ff_name, ff_id });
+        // 📊 10 Slots Logic එක මෙතනින් ක්‍රියාත්මක වෙනවා:
+        const playerCount = await Player.countDocuments({});
+        let finalFee = 200;
+        let finalStatus = "Pending";
+
+        if (playerCount < 10) {
+            finalFee = 0;
+            finalStatus = "Free";
+        }
+
+        // અලුත් ප්ලේයර්ව සේව් කිරීම
+        const newPlayer = new Player({ 
+            whatsapp, 
+            password, 
+            ff_name, 
+            ff_id,
+            reg_fee: finalFee,
+            payment_status: finalStatus
+        });
+        
         await newPlayer.save();
         
-        res.status(201).json({ message: "Registration Successful! 🔥" });
+        if (finalFee === 0) {
+            res.status(201).json({ message: `Registration Successful! ඔයා මුල්ම 10 දෙනා අතර සිටින බැවින් ලියාපදිංචිය නොමිලේ (Free)! 🔥 Slot: ${playerCount + 1}/10` });
+        } else {
+            res.status(201).json({ message: "Registration Successful! කරුණාකර ලියාපදිංචි ගාස්තුව (Rs.200) ගෙවා රිසිට්පත අප්ලෝඩ් කරන්න. 💸" });
+        }
 
     } catch (error) {
         console.error("Registration Error:", error);
@@ -77,7 +102,7 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-// === 🔐 2. LOGIN API ===
+// === 🔐 2. LOGIN API (UPDATED PROVIDING STATUS) ===
 app.post('/api/login', async (req, res) => {
     try {
         const { whatsapp, password } = req.body;
@@ -94,7 +119,9 @@ app.post('/api/login', async (req, res) => {
                 ff_name: player.ff_name,
                 ff_id: player.ff_id,
                 points: player.points,
-                reg_fee: player.reg_fee
+                reg_fee: player.reg_fee,
+                payment_status: player.payment_status, // Dashboard එකේ status පෙන්වන්න ඕන නිසා
+                payment_slip: player.payment_slip
             }
         });
     } catch (err) {
@@ -102,21 +129,21 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// 👥 3. සේරම ප්ලේයර්ස්ලාගේ ලිස්ට් එක ඇඩ්මින්ට ලබාදෙන API එක (UPDATED WITH ALL FIELDS)
+// === 👥 3. සේරම ප්ලේයර්ස්ලාගේ ලිස්ට් එක ඇඩ්මින්ට ලබාදෙන API එක ===
 app.post('/api/admin/players', async (req, res) => {
     const { adminPassword } = req.body;
     if (adminPassword !== "admin123") return res.status(403).json({ message: "Invalid Admin Password!" });
 
     try {
-        // ඔයාගේ Schema එකේ තියෙන ඔක්කොම fields ටික (Password හැර) මෙතනින් ඇදලා ගන්නවා
-        const players = await Player.find({}, 'whatsapp ff_name ff_id points reg_fee registered_at isBanned').sort({ points: -1 });
+        // 🆕 payment_slip සහ payment_status එකත් ඇඩ්මින්ට පේන්න මෙතනට ඇඩ් කරා
+        const players = await Player.find({}, 'whatsapp ff_name ff_id points reg_fee registered_at isBanned payment_slip payment_status').sort({ points: -1 });
         res.json(players);
     } catch (err) {
         res.status(500).json({ message: "Database error!" });
     }
 });
 
-// === 🏆 3. LEADERBOARD API ===
+// === 🏆 4. LEADERBOARD API ===
 app.get('/api/leaderboard', async (req, res) => {
     try {
         const players = await Player.find().sort({ points: -1 }).limit(10);
@@ -126,16 +153,15 @@ app.get('/api/leaderboard', async (req, res) => {
     }
 });
 
-// === ⚙️ 4. GET SETTINGS API ===
+// === ⚙️ 5. GET SETTINGS API ===
 app.get('/api/settings', (req, res) => {
     res.json(tournamentSettings);
 });
 
-// === 🔐 5. UPDATE SETTINGS API (ADMIN ONLY) ===
+// === 🔐 6. UPDATE SETTINGS API (ADMIN ONLY) ===
 app.post('/api/settings/update', (req, res) => {
     const { adminPassword, nextMatchTime, liveStatus, matchMessage, matchMap } = req.body;
 
-    // ඔයාගේ රහස් Password එක (admin123)
     if (adminPassword !== "admin123") {
         return res.status(403).json({ success: false, message: "Wrong Admin Password! ❌" });
     }
@@ -148,12 +174,12 @@ app.post('/api/settings/update', (req, res) => {
     res.json({ success: true, message: "Tournament Settings Updated Successfully! 🔥", settings: tournamentSettings });
 });
 
-// === 🌐 6. ADMIN HTML ROUTE ===
+// === 🌐 7. ADMIN HTML ROUTE ===
 app.get('/sudda', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'sudda.html'));
 });
 
-// 📈 1. ප්ලේයර් කෙනෙක්ගේ Points වෙනස් කිරීමේ API එක
+// === 📈 8. ප්ලේයර් කෙනෙක්ගේ Points වෙනස් කිරීමේ API එක ===
 app.post('/api/admin/update-points', async (req, res) => {
     const { adminPassword, whatsapp, newPoints } = req.body;
     if (adminPassword !== "admin123") return res.status(403).json({ message: "Invalid Admin Password!" });
@@ -167,7 +193,7 @@ app.post('/api/admin/update-points', async (req, res) => {
     }
 });
 
-// 🚫 2. ප්ලේයර් කෙනෙක්ව Ban කිරීම හෝ Unban කිරීමේ API එක
+// === 🚫 9. ප්ලේයර් කෙනෙක්ව Ban කිරීම හෝ Unban කිරීමේ API එක ===
 app.post('/api/admin/toggle-ban', async (req, res) => {
     const { adminPassword, whatsapp, isBanned } = req.body;
     if (adminPassword !== "admin123") return res.status(403).json({ message: "Invalid Admin Password!" });
@@ -178,6 +204,26 @@ app.post('/api/admin/toggle-ban', async (req, res) => {
         
         const statusText = isBanned ? "BANNED 🚫" : "UNBANNED ✅";
         res.json({ message: `Player ${player.ff_name} has been ${statusText}!` });
+    } catch (err) {
+        res.status(500).json({ message: "Database error!" });
+    }
+});
+
+// === ✅ 💸 10. ප්ලේයර්ගේ Payment එක Approve කරන නව API එක ===
+app.post('/api/admin/approve-payment', async (req, res) => {
+    const { adminPassword, whatsapp } = req.body;
+    if (adminPassword !== "admin123") return res.status(403).json({ message: "Invalid Admin Password!" });
+
+    try {
+        const player = await Player.findOneAndUpdate(
+            { whatsapp: whatsapp },
+            { payment_status: "Approved" },
+            { new: true }
+        );
+
+        if (!player) return res.status(404).json({ message: "Player not found!" });
+
+        res.json({ message: `${player.ff_name}ගේ ලියාපදිංචි ගාස්තුව සාර්ථකව Approve කරන ලදී! ✅` });
     } catch (err) {
         res.status(500).json({ message: "Database error!" });
     }
