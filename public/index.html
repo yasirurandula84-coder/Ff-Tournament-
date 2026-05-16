@@ -137,19 +137,17 @@
         <div class="max-w-7xl mx-auto px-4 mt-6">
             <div class="bg-zinc-950/60 border border-zinc-900 rounded-xl p-3 flex flex-wrap items-center justify-between gap-4">
                 <div class="flex items-center gap-3">
-                    <!-- 🟢 Live Status Badge එක Auto වෙනස් වෙන්න හැදුවා -->
                     <span id="liveBadge" class="bg-red-600 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded blink-animation">LIVE</span>
-                    <!-- 💬 සර්වර් එකේ මැසේජ් එක වැටෙන තැන -->
                     <p id="liveMatchMessage" class="text-xs md:text-sm text-gray-300 font-medium tracking-wide">Loading match details...</p>
                 </div>
-                <!-- 🗺️ සර්වර් එකේ මැප් එක වැටෙන තැන -->
                 <div id="liveMatchMap" class="text-xs text-gray-500 font-semibold uppercase">MAP: --</div>
             </div>
         </div>
 
         <main class="max-w-7xl mx-auto px-4 mt-6 grid grid-cols-1 lg:grid-cols-3 gap-8 pb-12">
-            <!-- PROFILE SECTION -->
-            <section class="lg:col-span-1">
+            <!-- PROFILE & PAYMENT SECTION -->
+            <section class="lg:col-span-1 space-y-6">
+                <!-- 🎮 PLAYER PROFILE CARD -->
                 <div class="gaming-card p-6 rounded-2xl border border-zinc-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.4)] backdrop-blur-md">
                     <h2 class="gaming-font text-base font-bold text-orange-500 mb-4 border-b border-zinc-800 pb-2 uppercase flex items-center gap-2">
                         <span>🎮 PLAYER PROFILE</span>
@@ -175,6 +173,27 @@
                     <div class="mt-6 pt-4 border-t border-zinc-900 text-center">
                         <p class="text-xs text-gray-400 mb-2">👇 Join with official match group</p>
                         <a href="https://chat.whatsapp.com/ඔයාගේ_ගෲප්_ලින්ක්_එක" target="_blank" class="block gaming-font bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg text-sm uppercase tracking-wider transition-all shadow-md shadow-green-950/20">💬 Join WhatsApp Group</a>
+                    </div>
+                </div>
+
+                <!-- 💳 NEW PAYMENT DETAILS CARD (Auto displays via JS if reg_fee > 0) -->
+                <div id="paymentSection" class="hidden bg-zinc-950/90 p-5 rounded-2xl border border-orange-500/30 shadow-[0_0_15px_rgba(249,115,22,0.05)] backdrop-blur-md">
+                    <h2 class="gaming-font text-xs font-bold text-orange-500 mb-3 uppercase tracking-wider flex items-center gap-2">
+                        <span class="animate-pulse text-red-500">⚡</span> <span>Tournament Fee Payment</span>
+                    </h2>
+                    <p class="text-xs text-gray-400 mb-4 leading-relaxed">ගෙවීම් සිදුකර WhatsApp සමූහයට රිසිට්පත යොමු කරන්න. (Send payment receipt to the WhatsApp group admin).</p>
+                    
+                    <div class="space-y-3 text-xs">
+                        <!-- Ez Cash Method -->
+                        <div class="bg-black/40 p-3 rounded-lg border border-zinc-800/80">
+                            <p class="text-orange-400 font-bold mb-1 uppercase tracking-wide">📱 eZ Cash / M Cash</p>
+                            <p class="text-gray-300 font-mono text-sm tracking-wider" id="paymentEzCash">Loading...</p>
+                        </div>
+                        <!-- Bank Method -->
+                        <div class="bg-black/40 p-3 rounded-lg border border-zinc-800/80">
+                            <p class="text-orange-400 font-bold mb-1 uppercase tracking-wide">🏦 Bank Transfer Details</p>
+                            <p class="text-gray-300 font-mono text-[11px] leading-relaxed whitespace-pre-line" id="paymentBank">Loading...</p>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -251,6 +270,14 @@
                 document.getElementById('liveMatchMessage').innerText = settings.matchMessage;
                 document.getElementById('liveMatchMap').innerText = `MAP: ${settings.matchMap}`;
 
+                // 🌟 [UPDATED] Inject EzCash and Bank info directly to HTML UI components
+                if (settings.ezCashNumber) {
+                    document.getElementById('paymentEzCash').innerText = settings.ezCashNumber;
+                }
+                if (settings.bankDetails) {
+                    document.getElementById('paymentBank').innerText = settings.bankDetails;
+                }
+
                 // 2. Change Badge Colors Dynamically based on live status
                 const badge = document.getElementById('liveBadge');
                 badge.innerText = settings.liveStatus;
@@ -291,8 +318,18 @@
                 document.getElementById('dashName').innerText = playerData.ff_name;
                 document.getElementById('dashID').innerText = playerData.ff_id;
                 document.getElementById('dashPoints').innerText = playerData.points;
-                document.getElementById('dashFee').innerText = playerData.reg_fee === 0 ? "FREE (Top 10)" : "Rs. 200.00";
-                document.getElementById('dashFee').className = playerData.reg_fee === 0 ? "text-green-400 font-bold" : "text-yellow-500 font-bold";
+                
+                // 🎫 Fee Checking Logic 
+                if (playerData.reg_fee === 0) {
+                    document.getElementById('dashFee').innerText = "FREE (Top 10)";
+                    document.getElementById('dashFee').className = "text-green-400 font-bold";
+                    document.getElementById('paymentSection').classList.add('hidden'); // Free අයට Payment Card එක හංගනවා
+                } else {
+                    document.getElementById('dashFee').innerText = "Rs. 200.00";
+                    document.getElementById('dashFee').className = "text-yellow-500 font-bold";
+                    document.getElementById('paymentSection').classList.remove('hidden'); // සල්ලි ගෙවන අයට විතරක් පෙන්වනවා
+                }
+                
                 loadLeaderboard();
             } else {
                 document.getElementById('dashboardScreen').classList.add('hidden');
