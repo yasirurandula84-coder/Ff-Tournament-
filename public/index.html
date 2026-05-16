@@ -6,124 +6,125 @@
     <title>FREE FIRE TOURNAMENT HUB</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-    
     <style>
         body {
             font-family: 'Rajdhani', sans-serif;
             background: radial-gradient(circle at center, #1a0b05 0%, #0a0502 100%);
         }
-        .gaming-font {
-            font-family: 'Orbitron', sans-serif;
-        }
-        .neon-border {
-            box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
-            border: 1px solid rgba(239, 68, 68, 0.5);
-        }
-        .neon-text {
-            text-shadow: 0 0 10px rgba(249, 115, 22, 0.6);
-        }
+        .gaming-font { font-family: 'Orbitron', sans-serif; }
+        .neon-border { box-shadow: 0 0 15px rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); }
+        .neon-text { text-shadow: 0 0 10px rgba(249, 115, 22, 0.6); }
     </style>
 </head>
 <body class="text-gray-100 min-h-screen pb-12">
 
-    <header class="text-center py-8 px-4 border-b border-red-900/30 bg-black/40 backdrop-blur-md">
+    <!-- Header Banner -->
+    <header class="text-center py-6 px-4 border-b border-red-900/30 bg-black/40 backdrop-blur-md">
         <h1 class="gaming-font text-3xl md:text-5xl font-black tracking-wider text-orange-500 neon-text uppercase">
             FF TOURNAMENT HUB
         </h1>
-        <p class="text-gray-400 mt-2 text-sm md:text-base font-semibold tracking-widest uppercase">
-            Battlefield Leaderboard & Registration
-        </p>
     </header>
 
-    <main class="max-w-6xl mx-auto px-4 mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <main class="max-w-7xl mx-auto px-4 mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
         
+        <!-- LEFT COLUMN: AUTH & PROFILE -->
         <section class="lg:col-span-1 space-y-6">
             
-            <div class="bg-black/60 p-6 rounded-xl neon-border backdrop-blur-md">
-                <h2 class="gaming-font text-xl font-bold text-red-500 mb-4 border-b border-red-500/20 pb-2 uppercase">
-                    Tournament Info
+            <!-- 1. REGISTRATION FORM (If not logged in) -->
+            <div id="registerBox" class="bg-black/60 p-6 rounded-xl neon-border backdrop-blur-md">
+                <h2 class="gaming-font text-lg font-bold text-orange-500 mb-4 border-b border-orange-500/20 pb-2 uppercase">
+                    🛡️ Create Account
                 </h2>
-                <ul class="space-y-3 text-sm md:text-base text-gray-300">
-                    <li class="flex items-center gap-2">
-                        <span class="text-orange-500">🔥</span> 
-                        <span>First 10 Players: <b class="text-green-400">FREE REGISTER</b></span>
-                    </li>
-                    <li class="flex items-center gap-2">
-                        <span class="text-orange-500">💵</span> 
-                        <span>After 10 Players: <b>Rs. 200.00</b></span>
-                    </li>
-                    <li class="flex items-center gap-2">
-                        <span class="text-green-500">⚡</span> 
-                        <span>Match Win: <b class="text-green-400">+10 Points</b></span>
-                    </li>
-                    <li class="flex items-center gap-2">
-                        <span class="text-red-500">💀</span> 
-                        <span>Match Defeat: <b class="text-red-400">-5 Points</b></span>
-                    </li>
-                    <li class="flex items-center gap-2">
-                        <span class="text-yellow-500">🏆</span> 
-                        <span class="text-yellow-400 font-bold">Weekly Top 3: Weekly Membership!</span>
-                    </li>
-                </ul>
+                <form id="regForm" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">WhatsApp Number</label>
+                        <input type="text" id="reg_whatsapp" placeholder="947XXXXXXXX" required class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-sm text-white focus:outline-none focus:border-orange-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Create Password</label>
+                        <input type="password" id="reg_password" placeholder="••••••••" required class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-sm text-white focus:outline-none focus:border-orange-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Free Fire Name</label>
+                        <input type="text" id="reg_name" placeholder="In-Game Name" required class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-sm text-white focus:outline-none focus:border-orange-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Free Fire UID</label>
+                        <input type="text" id="reg_id" placeholder="In-Game ID" required class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-sm text-white focus:outline-none focus:border-orange-500">
+                    </div>
+                    <button type="submit" class="w-full gaming-font bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 text-white font-black py-2.5 rounded text-sm uppercase tracking-wider transition-all">Register</button>
+                </form>
+                <p class="text-xs text-gray-400 mt-3 text-center">Already have an account? <button onclick="switchAuth(true)" class="text-orange-500 underline">Login here</button></p>
+                <p id="regMessage" class="mt-3 text-center text-xs font-semibold hidden"></p>
             </div>
 
-            <div class="bg-black/60 p-6 rounded-xl neon-border backdrop-blur-md">
-                <h2 class="gaming-font text-xl font-bold text-orange-500 mb-4 border-b border-orange-500/20 pb-2 uppercase">
-                    Join The Battle
+            <!-- 2. LOGIN FORM -->
+            <div id="loginBox" class="bg-black/60 p-6 rounded-xl neon-border backdrop-blur-md hidden">
+                <h2 class="gaming-font text-lg font-bold text-orange-500 mb-4 border-b border-orange-500/20 pb-2 uppercase">
+                    🔑 Player Login
                 </h2>
-                
-                <form id="regForm" class="space-y-4">
+                <form id="loginForm" class="space-y-3">
                     <div>
-                        <label class="block text-sm font-bold text-gray-400 uppercase mb-1">WhatsApp Number</label>
-                        <input type="text" id="whatsapp" placeholder="e.g., 947XXXXXXXX" required
-                            class="w-full bg-gray-900/80 border border-gray-700 rounded p-2.5 text-white focus:outline-none focus:border-orange-500 transition-colors">
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">WhatsApp Number</label>
+                        <input type="text" id="log_whatsapp" placeholder="947XXXXXXXX" required class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-sm text-white focus:outline-none focus:border-orange-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-gray-400 uppercase mb-1">Free Fire Name</label>
-                        <input type="text" id="ff_name" placeholder="In-Game Name" required
-                            class="w-full bg-gray-900/80 border border-gray-700 rounded p-2.5 text-white focus:outline-none focus:border-orange-500 transition-colors">
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Password</label>
+                        <input type="password" id="log_password" placeholder="••••••••" required class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-sm text-white focus:outline-none focus:border-orange-500">
                     </div>
-                    <div>
-                        <label class="block text-sm font-bold text-gray-400 uppercase mb-1">Free Fire UID</label>
-                        <input type="text" id="ff_id" placeholder="In-Game ID" required
-                            class="w-full bg-gray-900/80 border border-gray-700 rounded p-2.5 text-white focus:outline-none focus:border-orange-500 transition-colors">
-                    </div>
-                    
-                    <button type="submit" 
-                        class="w-full gaming-font bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500 text-white font-black py-3 rounded uppercase tracking-wider transition-all transform active:scale-95 shadow-lg shadow-orange-600/30">
-                        Register Now
-                    </button>
+                    <button type="submit" class="w-full gaming-font bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 text-white font-black py-2.5 rounded text-sm uppercase tracking-wider transition-all">Login</button>
                 </form>
-                
-                <p id="regMessage" class="mt-4 text-center text-sm font-semibold hidden"></p>
+                <p class="text-xs text-gray-400 mt-3 text-center">Need an account? <button onclick="switchAuth(false)" class="text-orange-500 underline">Register here</button></p>
+                <p id="loginMessage" class="mt-3 text-center text-xs font-semibold hidden"></p>
             </div>
+
+            <!-- 3. LOGGED IN DASHBOARD -->
+            <div id="dashboardBox" class="bg-black/80 p-6 rounded-xl border border-green-500/40 shadow-[0_0_15px_rgba(34,197,94,0.1)] backdrop-blur-md hidden">
+                <h2 class="gaming-font text-lg font-bold text-green-400 mb-4 border-b border-green-500/20 pb-2 uppercase flex justify-between items-center">
+                    <span>🎮 Player Profile</span>
+                    <button onclick="logout()" class="text-xs bg-red-600/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded">Logout</button>
+                </h2>
+                <div class="space-y-3 text-sm">
+                    <p class="flex justify-between border-b border-gray-800 pb-1"><span class="text-gray-400">Name:</span> <b id="dashName" class="text-white">--</b></p>
+                    <p class="flex justify-between border-b border-gray-800 pb-1"><span class="text-gray-400">Free Fire ID:</span> <b id="dashID" class="text-white">--</b></p>
+                    <p class="flex justify-between border-b border-gray-800 pb-1"><span class="text-gray-400">My Points:</span> <b id="dashPoints" class="text-orange-500 text-lg">0</b></p>
+                    <p class="flex justify-between border-b border-gray-800 pb-1"><span class="text-gray-400">Entry Fee Status:</span> <b id="dashFee" class="text-white">--</b></p>
+                </div>
+                
+                <!-- Official WhatsApp Group Link Button -->
+                <div class="mt-5 pt-3 border-t border-gray-800 text-center">
+                    <p class="text-xs text-gray-400 mb-2">👇 Click below to join the official group</p>
+                    <a href="https://chat.whatsapp.com/ඔයාගේ_ගෲප්_ලින්ක්_එක" target="_blank"
+                        class="block gaming-font bg-green-600 hover:bg-green-500 text-white font-bold py-2.5 rounded text-sm uppercase tracking-wide transition-all shadow-md shadow-green-600/20">
+                        💬 Join WhatsApp Group
+                    </a>
+                </div>
+            </div>
+
         </section>
 
+        <!-- RIGHT COLUMN: LIVE LEADERBOARD -->
         <section class="lg:col-span-2">
-            <div class="bg-black/60 p-6 rounded-xl neon-border backdrop-blur-md min-h-[400px]">
+            <div class="bg-black/60 p-6 rounded-xl neon-border backdrop-blur-md min-h-[450px]">
                 <div class="flex justify-between items-center mb-4 border-b border-red-500/20 pb-2">
-                    <h2 class="gaming-font text-xl md:text-2xl font-black text-red-500 uppercase tracking-wide">
-                        🏆 TOP PLAYERS STANDINGS
+                    <h2 class="gaming-font text-lg md:text-xl font-black text-red-500 uppercase tracking-wide">
+                        🏆 TOURNAMENT STANDINGS
                     </h2>
-                    <button onclick="loadLeaderboard()" class="text-xs bg-gray-800 hover:bg-gray-700 px-3 py-1 rounded text-gray-400 transition-colors">
-                        🔄 Refresh
-                    </button>
+                    <button onclick="loadLeaderboard()" class="text-xs bg-gray-800 hover:bg-gray-700 px-3 py-1 rounded text-gray-400">🔄 Refresh</button>
                 </div>
 
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="border-b border-gray-800 text-gray-400 uppercase text-sm font-bold">
+                            <tr class="border-b border-gray-800 text-gray-400 uppercase text-xs font-bold">
                                 <th class="py-3 px-2 text-center w-12">Rank</th>
                                 <th class="py-3 px-4">Player Name</th>
                                 <th class="py-3 px-4 hidden sm:table-cell">Free Fire ID</th>
                                 <th class="py-3 px-4 text-right">Points</th>
                             </tr>
                         </thead>
-                        <tbody id="leaderboardBody" class="divide-y divide-gray-900 text-sm md:text-base">
-                            <tr>
-                                <td colspan="4" class="text-center py-8 text-gray-500">Loading players battlefield data...</td>
-                            </tr>
+                        <tbody id="leaderboardBody" class="divide-y divide-gray-900 text-sm">
+                            <tr><td colspan="4" class="text-center py-8 text-gray-500">Loading standings data...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -132,84 +133,138 @@
     </main>
 
     <script>
-        // API Base URL (Render එකට දැම්මම මේක auto වැඩ කරනවා එකම server එකේ නිසා)
         const API_URL = window.location.origin;
 
-        // 1. LOAD LEADERBOARD DATA
+        // Switch Register and Login UI views
+        function switchAuth(showLogin) {
+            document.getElementById('loginBox').classList.toggle('hidden', !showLogin);
+            document.getElementById('registerBox').classList.toggle('hidden', showLogin);
+        }
+
+        // Check user session storage on page load
+        function checkSession() {
+            const player = JSON.stringify(localStorage.getItem('ff_player'));
+            const savedPlayer = JSON.parse(localStorage.getItem('ff_player'));
+            if(savedPlayer) {
+                showDashboard(savedPlayer);
+            }
+        }
+
+        function showDashboard(player) {
+            document.getElementById('registerBox').classList.add('hidden');
+            document.getElementById('loginBox').classList.add('hidden');
+            document.getElementById('dashboardBox').classList.remove('hidden');
+
+            document.getElementById('dashName').innerText = player.ff_name;
+            document.getElementById('dashID').innerText = player.ff_id;
+            document.getElementById('dashPoints').innerText = player.points;
+            document.getElementById('dashFee').innerText = player.reg_fee === 0 ? "FREE (Top 10)" : "Rs. 200.00";
+            document.getElementById('dashFee').className = player.reg_fee === 0 ? "text-green-400 font-bold" : "text-yellow-500 font-bold";
+        }
+
+        function logout() {
+            localStorage.removeItem('ff_player');
+            document.getElementById('dashboardBox').classList.add('hidden');
+            document.getElementById('registerBox').classList.remove('hidden');
+        }
+
+        // LOAD LEADERBOARD
         async function loadLeaderboard() {
             try {
                 const response = await fetch(`${API_URL}/api/leaderboard`);
                 const players = await response.json();
-                
                 const tbody = document.getElementById('leaderboardBody');
                 tbody.innerHTML = '';
 
                 if(players.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="4" class="text-center py-8 text-gray-500">No players registered yet! Be the first.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="4" class="text-center py-8 text-gray-500">No players registered yet!</td></tr>`;
                     return;
                 }
 
                 players.forEach((player, index) => {
                     let rankBadge = index + 1;
-                    let rowClass = "hover:bg-white/5 transition-colors";
-                    
-                    // Top 3 අයට විශේෂ කලර්ස්
-                    if (index === 0) { rankBadge = '🥇'; rowClass = "bg-yellow-500/10 hover:bg-yellow-500/20 font-bold text-yellow-400"; }
-                    else if (index === 1) { rankBadge = '🥈'; rowClass = "bg-gray-400/10 hover:bg-gray-400/20 font-bold text-gray-300"; }
-                    else if (index === 2) { rankBadge = '🥉'; rowClass = "bg-amber-700/10 hover:bg-amber-700/20 font-bold text-amber-500"; }
+                    let rowClass = "hover:bg-white/5";
+                    if (index === 0) { rankBadge = '🥇'; rowClass = "bg-yellow-500/10 font-bold text-yellow-400"; }
+                    else if (index === 1) { rankBadge = '🥈'; rowClass = "bg-gray-400/10 font-bold text-gray-300"; }
+                    else if (index === 2) { rankBadge = '🥉'; rowClass = "bg-amber-700/10 font-bold text-amber-500"; }
 
                     tbody.innerHTML += `
-                        <tr class="${rowClass}">
-                            <td class="py-4 px-2 text-center text-lg">${rankBadge}</td>
-                            <td class="py-4 px-4 font-semibold">${player.ff_name}</td>
-                            <td class="py-4 px-4 text-gray-400 hidden sm:table-cell">${player.ff_id}</td>
-                            <td class="py-4 px-4 text-right font-bold text-orange-500 text-lg">${player.points}</td>
+                        <tr class="${rowClass} border-b border-gray-900/40">
+                            <td class="py-3 px-2 text-center text-base">${rankBadge}</td>
+                            <td class="py-3 px-4 font-semibold">${player.ff_name}</td>
+                            <td class="py-3 px-4 text-gray-400 hidden sm:table-cell">${player.ff_id}</td>
+                            <td class="py-3 px-4 text-right font-bold text-orange-500">${player.points}</td>
                         </tr>
                     `;
                 });
-            } catch (error) {
-                console.error("Error fetching leaderboard:", error);
-            }
+            } catch (error) { console.error("Error:", error); }
         }
 
-        // 2. HANDLE REGISTRATION FORM SUBMIT
+        // REGISTRATION HANDLER
         document.getElementById('regForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             const msgEl = document.getElementById('regMessage');
-            msgEl.className = "mt-4 text-center text-sm font-semibold block text-blue-400";
-            msgEl.innerText = "Processing registration...";
+            msgEl.className = "mt-3 text-center text-xs font-semibold block text-blue-400";
+            msgEl.innerText = "Processing...";
 
-            const whatsapp = document.getElementById('whatsapp').value;
-            const ff_name = document.getElementById('ff_name').value;
-            const ff_id = document.getElementById('ff_id').value;
+            const whatsapp = document.getElementById('reg_whatsapp').value;
+            const password = document.getElementById('reg_password').value;
+            const ff_name = document.getElementById('reg_name').value;
+            const ff_id = document.getElementById('reg_id').value;
 
             try {
                 const response = await fetch(`${API_URL}/api/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ whatsapp, ff_name, ff_id })
+                    body: JSON.stringify({ whatsapp, password, ff_name, ff_id })
                 });
-
                 const data = await response.json();
 
                 if (response.ok) {
-                    msgEl.className = "mt-4 text-center text-sm font-semibold block text-green-400 bg-green-500/10 p-3 rounded border border-green-500/20";
+                    msgEl.className = "mt-3 text-center text-xs font-semibold block text-green-400 bg-green-500/10 p-2 rounded";
                     msgEl.innerText = data.message;
                     document.getElementById('regForm').reset();
-                    loadLeaderboard(); // සයිට් එකේ Table එක refresh කරනවා
+                    setTimeout(() => switchAuth(true), 2000); // විනාඩි 2කින් login එකට මාරු කරනවා
+                    loadLeaderboard();
                 } else {
-                    msgEl.className = "mt-4 text-center text-sm font-semibold block text-red-400 bg-red-500/10 p-3 rounded border border-red-500/20";
-                    msgEl.innerText = data.message || "Registration failed!";
+                    msgEl.className = "mt-3 text-center text-xs font-semibold block text-red-400 bg-red-500/10 p-2 rounded";
+                    msgEl.innerText = data.message;
                 }
-            } catch (error) {
-                msgEl.className = "mt-4 text-center text-sm font-semibold block text-red-400";
-                msgEl.innerText = "Error connecting to server!";
-            }
+            } catch (error) { msgEl.innerText = "Connection error!"; }
         });
 
-        // සයිට් එක ලෝඩ් වෙද්දීම ලීඩර්බෝඩ් එක පෙන්වන්න
-        window.onload = loadLeaderboard;
+        // LOGIN HANDLER
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const msgEl = document.getElementById('loginMessage');
+            msgEl.className = "mt-3 text-center text-xs font-semibold block text-blue-400";
+            msgEl.innerText = "Verifying...";
+
+            const whatsapp = document.getElementById('log_whatsapp').value;
+            const password = document.getElementById('log_password').value;
+
+            try {
+                const response = await fetch(`${API_URL}/api/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ whatsapp, password })
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('ff_player', JSON.stringify(data.player));
+                    showDashboard(data.player);
+                } else {
+                    msgEl.className = "mt-3 text-center text-xs font-semibold block text-red-400 bg-red-500/10 p-2 rounded";
+                    msgEl.innerText = data.message;
+                }
+            } catch (error) { msgEl.innerText = "Connection error!"; }
+        });
+
+        window.onload = () => {
+            loadLeaderboard();
+            checkSession();
+        };
     </script>
 </body>
 </html>
