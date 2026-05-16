@@ -133,11 +133,11 @@
 
     <!-- ================= DASHBOARD SCREEN ================= -->
     <div id="dashboardScreen" class="hidden flex-grow">
-        <header class="py-5 px-4 border-b border-zinc-900 bg-black/50 backdrop-blur-md sticky top-0 id='mainNav' z-50">
+        <header class="py-5 px-4 border-b border-zinc-900 bg-black/50 backdrop-blur-md sticky top-0 z-50">
             <div class="max-w-7xl mx-auto w-full flex flex-col md:flex-row justify-between items-center gap-4">
                 <h1 class="gaming-font text-xl md:text-2xl font-black tracking-wider text-orange-500 neon-text uppercase">HUB MAINBOARD</h1>
                 
-                <!-- 🌐 NAVIGATION MENU (HOME, DASHBOARD, LEADERBOARD, PROFILE) -->
+                <!-- 🌐 NAVIGATION MENU -->
                 <nav class="flex bg-zinc-950 border border-zinc-800 p-1 rounded-xl gaming-font text-xs uppercase tracking-wider">
                     <button onclick="switchTab('home')" id="tab-home" class="px-4 py-2 rounded-lg text-gray-400 hover:text-white font-bold transition-all duration-300">Home</button>
                     <button onclick="switchTab('dashboard')" id="tab-dashboard" class="px-4 py-2 rounded-lg text-gray-400 hover:text-white font-bold transition-all duration-300">Dashboard</button>
@@ -149,7 +149,7 @@
             </div>
         </header>
 
-        <!-- 📡 LIVE MATCH TICKER PANEL (Shared across layouts) -->
+        <!-- 📡 LIVE MATCH TICKER PANEL -->
         <div class="max-w-7xl mx-auto px-4 mt-6">
             <div class="bg-zinc-950/60 border border-zinc-900 rounded-xl p-3 flex flex-wrap items-center justify-between gap-4">
                 <div class="flex items-center gap-3">
@@ -169,7 +169,6 @@
                     <h2 class="gaming-font text-2xl font-black text-orange-500 mb-2 uppercase">💥 WELCOME TO TOURNAMENT ARENA</h2>
                     <p class="text-sm text-gray-300 max-w-2xl leading-relaxed">මෙම ප්ලේයර් පැනලය හරහා ඔබට ඉදිරි තරඟ වටවල විස්තර සජීවීව බලාගත හැක. නීති විරෝධී ලෙස ක්‍රීඩා කරන ක්‍රීඩකයින් පද්ධතියෙන් ස්වයංක්‍රීයව ඉවත් කරනු ලැබේ.</p>
                 </div>
-                <!-- Mini Grid Features -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="bg-zinc-950/80 p-5 rounded-xl border border-zinc-900">
                         <h3 class="font-bold text-orange-500 uppercase mb-2">📌 තරඟ නීති (Rules)</h3>
@@ -189,9 +188,8 @@
                 </div>
             </div>
 
-            <!-- 📊 2. DASHBOARD & PROFILE LAYOUT (Combined or split) -->
+            <!-- 📊 2. DASHBOARD TAB CONTENT -->
             <div id="content-dashboard" class="tab-content hidden grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- PROFILE PANEL (Shows details in dashboard view too) -->
                 <div class="lg:col-span-1 space-y-6">
                     <div class="gaming-card p-6 rounded-2xl border border-zinc-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.4)] backdrop-blur-md">
                         <h2 class="gaming-font text-base font-bold text-orange-500 mb-4 border-b border-zinc-800 pb-2 uppercase">🎮 DASH OVERVIEW</h2>
@@ -208,7 +206,7 @@
                         </div>
                     </div>
                     <!-- 💳 PAYMENT DETAILS CARD -->
-                    <div id="dashPaymentSection" class="hidden bg-zinc-950/90 p-5 rounded-2xl border border-orange-500/30 shadow-[0_0_15px_rgba(249,115,22,0.05)]">
+                    <div id="dashPaymentSection" class="hidden bg-zinc-950/90 p-5 rounded-2xl border border-orange-500/30">
                         <h2 class="gaming-font text-xs font-bold text-orange-500 mb-3 uppercase flex items-center gap-2">
                             <span class="animate-pulse text-red-500">⚡</span> <span>Tournament Fee Payment</span>
                         </h2>
@@ -280,16 +278,19 @@
                             <span class="font-mono font-bold text-white tracking-wider user-id-placeholder">--</span>
                         </div>
                         <div class="bg-black/40 p-4 rounded-xl border border-zinc-900/60">
+                            <span class="block text-xs text-gray-500 uppercase mb-0.5">WhatsApp Number</span>
+                            <span class="font-bold text-white user-whatsapp-placeholder">--</span>
+                        </div>
+                        <div class="bg-black/40 p-4 rounded-xl border border-zinc-900/60">
                             <span class="block text-xs text-gray-500 uppercase mb-0.5">Ranked Points</span>
                             <span class="font-bold text-orange-500 gaming-font text-lg user-points-placeholder">0</span>
                         </div>
-                        <div class="bg-black/40 p-4 rounded-xl border border-zinc-900/60">
+                        <div class="bg-black/40 p-4 rounded-xl border border-zinc-900/60 sm:col-span-2">
                             <span class="block text-xs text-gray-500 uppercase mb-0.5">Entry Ticket Status</span>
                             <span class="font-bold user-fee-placeholder">--</span>
                         </div>
                     </div>
 
-                    <!-- Dynamic Payment Display inside Profile tab too -->
                     <div id="profilePaymentSection" class="hidden pt-2">
                         <h3 class="text-xs font-bold text-orange-500 uppercase mb-3 tracking-wider">💳 Complete Your Payment</h3>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
@@ -310,18 +311,13 @@
         const API_URL = "https://ff-tournament-k4gk.onrender.com";
         let countdownInterval = null;
 
-        // === 🌐 TAB SWITCH FUNCTION ===
         function switchTab(tabId) {
-            // Hide all tab contents
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            // Show requested tab content
             document.getElementById(`content-${tabId}`).classList.remove('hidden');
 
-            // Reset navigation button states
             ['home', 'dashboard', 'leaderboard', 'profile'].forEach(id => {
                 document.getElementById(`tab-${id}`).className = "px-4 py-2 rounded-lg text-gray-400 hover:text-white font-bold transition-all duration-300";
             });
-            // Highlight active navigation button
             document.getElementById(`tab-${tabId}`).classList.add('active-tab');
         }
 
@@ -361,7 +357,6 @@
                 document.getElementById('liveMatchMessage').innerText = settings.matchMessage;
                 document.getElementById('liveMatchMap').innerText = `MAP: ${settings.matchMap}`;
 
-                // Set multiple elements sharing payment details placeholder classes
                 document.querySelectorAll('.payment-ezcash-placeholder').forEach(el => el.innerText = settings.ezCashNumber || '--');
                 document.querySelectorAll('.payment-bank-placeholder').forEach(el => el.innerText = settings.bankDetails || '--');
 
@@ -379,7 +374,6 @@
             } catch (error) { console.error("Error setting configs:", error); }
         }
 
-        // === 🛡️ SYNC PROFILE REAL-TIME & KICK BAN PLAYERS ===
         async function checkCurrentPlayerStatus() {
             const savedPlayer = JSON.parse(localStorage.getItem('ff_player'));
             if (!savedPlayer) return; 
@@ -402,11 +396,12 @@
         }
 
         function updateUIPlaceholders(playerData) {
-            document.querySelectorAll('.user-name-placeholder').forEach(el => el.innerText = playerData.ff_name);
-            document.querySelectorAll('.user-id-placeholder').forEach(el => el.innerText = playerData.ff_id);
-            document.querySelectorAll('.user-points-placeholder').forEach(el => el.innerText = playerData.points);
+            if (!playerData) return;
+            document.querySelectorAll('.user-name-placeholder').forEach(el => el.innerText = playerData.ff_name || '--');
+            document.querySelectorAll('.user-id-placeholder').forEach(el => el.innerText = playerData.ff_id || '--');
+            document.querySelectorAll('.user-whatsapp-placeholder').forEach(el => el.innerText = playerData.whatsapp || '--');
+            document.querySelectorAll('.user-points-placeholder').forEach(el => el.innerText = playerData.points !== undefined ? playerData.points : '0');
             
-            // Fee calculation update across nodes
             document.querySelectorAll('.user-fee-placeholder').forEach(el => {
                 if (playerData.reg_fee === 0) {
                     el.innerText = "FREE (Top 10)";
@@ -440,7 +435,7 @@
                 document.getElementById('dashboardScreen').classList.remove('hidden');
                 
                 updateUIPlaceholders(playerData);
-                switchTab('home'); // Defaut to Home tab view upon entry
+                switchTab('home'); 
                 loadLeaderboard();
             } else {
                 document.getElementById('dashboardScreen').classList.add('hidden');
@@ -579,7 +574,6 @@
             }
         });
 
-        // === 🔄 AUTOMATED REAL-TIME INTERACTION LOOP ===
         window.onload = function() {
             checkSession();
             fetchTournamentSettings(); 
