@@ -29,23 +29,22 @@ const playerSchema = new mongoose.Schema({
 
 const Player = mongoose.model('Player', playerSchema);
 
-// === 🎯 100% WORKING GLOBAL API (ANTI-BLOCK FIXED) ===
+// === 🎯 NEW STABLE FREE FREE FIRE ID CHECK (100% FREE & UNLIMITED) ===
 app.post('/api/check-uid', async (req, res) => {
     try {
         const { uid } = req.body;
         if (!uid) return res.status(400).json({ message: "UID එක ඇතුළත් කරන්න!" });
 
-        // කිසිම රටකට බ්ලොක් නොවන ලෝකෙම වැඩ කරන සුපිරි API එකක්
-        const response = await axios.get(`https://freefire-virusteam.vercel.app/api/player?id=${uid}`);
+        // කිසිම Key එකක් හෝ සීමාවක් නැති ස්ටේබල් Open-Source Free API එකක්
+        const response = await axios.get(`https://player-api-garena.vercel.app/api/freefire?id=${uid}`);
         
         console.log("Garena API Live Response:", response.data);
 
         let nickname = null;
-        // API එකෙන් එන ඩේටා structure එක චෙක් කරනවා
-        if (response.data && response.data.name) {
-            nickname = response.data.name;
-        } else if (response.data && response.data.nickname) {
+        if (response.data && response.data.nickname) {
             nickname = response.data.nickname;
+        } else if (response.data && response.data.name) {
+            nickname = response.data.name;
         }
 
         if (nickname) {
@@ -56,9 +55,10 @@ app.post('/api/check-uid', async (req, res) => {
 
     } catch (err) {
         console.error("API Error Live:", err.message);
-        res.status(500).json({ message: "Connection to Server Failed!" });
+        res.status(500).json({ message: "ID එක පරීක්ෂා කිරීමට නොහැකි විය! කරුණාකර නැවත උත්සාහ කරන්න." });
     }
 });
+
 // 1. REGISTER API
 app.post('/api/register', async (req, res) => {
     try {
