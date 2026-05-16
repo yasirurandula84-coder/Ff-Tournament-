@@ -29,7 +29,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* ✨ NEW GAMING EFFECTS */
         .blink-animation { animation: blink 1.5s infinite; }
         @keyframes blink {
             0%, 100% { opacity: 1; }
@@ -176,20 +175,18 @@
                     </div>
                 </div>
 
-                <!-- 💳 NEW PAYMENT DETAILS CARD (Auto displays via JS if reg_fee > 0) -->
+                <!-- 💳 PAYMENT DETAILS CARD -->
                 <div id="paymentSection" class="hidden bg-zinc-950/90 p-5 rounded-2xl border border-orange-500/30 shadow-[0_0_15px_rgba(249,115,22,0.05)] backdrop-blur-md">
                     <h2 class="gaming-font text-xs font-bold text-orange-500 mb-3 uppercase tracking-wider flex items-center gap-2">
                         <span class="animate-pulse text-red-500">⚡</span> <span>Tournament Fee Payment</span>
                     </h2>
-                    <p class="text-xs text-gray-400 mb-4 leading-relaxed">ගෙවීම් සිදුකර WhatsApp සමූහයට රිසිට්පත යොමු කරන්න. (Send payment receipt to the WhatsApp group admin).</p>
+                    <p class="text-xs text-gray-400 mb-4 leading-relaxed">ගෙවීම් සිදුකර WhatsApp සමූහයට رිසිට්පත යොමු කරන්න.</p>
                     
                     <div class="space-y-3 text-xs">
-                        <!-- Ez Cash Method -->
                         <div class="bg-black/40 p-3 rounded-lg border border-zinc-800/80">
                             <p class="text-orange-400 font-bold mb-1 uppercase tracking-wide">📱 eZ Cash / M Cash</p>
                             <p class="text-gray-300 font-mono text-sm tracking-wider" id="paymentEzCash">Loading...</p>
                         </div>
-                        <!-- Bank Method -->
                         <div class="bg-black/40 p-3 rounded-lg border border-zinc-800/80">
                             <p class="text-orange-400 font-bold mb-1 uppercase tracking-wide">🏦 Bank Transfer Details</p>
                             <p class="text-gray-300 font-mono text-[11px] leading-relaxed whitespace-pre-line" id="paymentBank">Loading...</p>
@@ -225,14 +222,15 @@
         </main>
     </div>
 
+    <!-- ========================================================= -->
+    <!--                   🎮 JAVASCRIPT LOGIC                      -->
+    <!-- ========================================================= -->
     <script>
         const API_URL = "https://ff-tournament-k4gk.onrender.com";
         let countdownInterval = null;
 
-        // === ⏳ සර්වර් එකේ වෙලාවට හැදෙන LIVE COUNTDOWN TIMER LOGIC ===
         function updateLiveCountdown(targetTimeStr) {
             if (countdownInterval) clearInterval(countdownInterval);
-
             const countdownContainer = document.getElementById('countdown');
             
             function calculateTime() {
@@ -255,30 +253,21 @@
                     <div class="bg-black/50 p-2 rounded border border-zinc-900"><span>${secs.toString().padStart(2, '0')}</span><p class="text-[9px] font-normal text-gray-500 tracking-normal mt-0.5">SECS</p></div>
                 `;
             }
-
             countdownInterval = setInterval(calculateTime, 1000);
             calculateTime();
         }
 
-        // === 📡 🛠️ FETCH AND UPDATE SETTINGS FROM SERVER ===
         async function fetchTournamentSettings() {
             try {
                 const response = await fetch(`${API_URL}/api/settings`);
                 const settings = await response.json();
 
-                // 1. Update Match Message and Map Info
                 document.getElementById('liveMatchMessage').innerText = settings.matchMessage;
                 document.getElementById('liveMatchMap').innerText = `MAP: ${settings.matchMap}`;
 
-                // 🌟 [UPDATED] Inject EzCash and Bank info directly to HTML UI components
-                if (settings.ezCashNumber) {
-                    document.getElementById('paymentEzCash').innerText = settings.ezCashNumber;
-                }
-                if (settings.bankDetails) {
-                    document.getElementById('paymentBank').innerText = settings.bankDetails;
-                }
+                if (settings.ezCashNumber) document.getElementById('paymentEzCash').innerText = settings.ezCashNumber;
+                if (settings.bankDetails) document.getElementById('paymentBank').innerText = settings.bankDetails;
 
-                // 2. Change Badge Colors Dynamically based on live status
                 const badge = document.getElementById('liveBadge');
                 badge.innerText = settings.liveStatus;
                 if (settings.liveStatus === "LIVE") {
@@ -289,14 +278,27 @@
                     badge.className = "bg-zinc-700 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded";
                 }
 
-                // 3. Trigger Live Countdown Timer from Server's time
-                if (settings.nextMatchTime) {
-                    updateLiveCountdown(settings.nextMatchTime);
-                }
+                if (settings.nextMatchTime) updateLiveCountdown(settings.nextMatchTime);
+            } catch (error) { console.error("Error setting configs:", error); }
+        }
 
-            } catch (error) {
-                console.error("Error connecting to server settings API:", error);
-            }
+        // === 🛡️ [NEW LOGIC] ප්ලේයර් BAN ද කියලා LIVE බලා AUTO-KICK කරන කෝඩ් එක ===
+        async function checkCurrentPlayerStatus() {
+            const savedPlayer = JSON.parse(localStorage.getItem('ff_player'));
+            if (!savedPlayer) return; 
+
+            try {
+                const response = await fetch(`${API_URL}/api/players/${savedPlayer.whatsapp}`);
+                if (response.ok) {
+                    const playerData = await response.json();
+                    
+                    // සර්වර් එකේ ප්ලේයර් Ban ද හෝ ඩේටා නැද්ද (Delete ද) කියලා බලනවා
+                    if (playerData.isBanned === true || !playerData) {
+                        alert("🚫 Your account has been suspended or deleted by Admin!");
+                        logout(); 
+                    }
+                }
+            } catch (error) { console.error("Error checking player ban status:", error); }
         }
 
         function switchAuth(showLogin) {
@@ -319,17 +321,15 @@
                 document.getElementById('dashID').innerText = playerData.ff_id;
                 document.getElementById('dashPoints').innerText = playerData.points;
                 
-                // 🎫 Fee Checking Logic 
                 if (playerData.reg_fee === 0) {
                     document.getElementById('dashFee').innerText = "FREE (Top 10)";
                     document.getElementById('dashFee').className = "text-green-400 font-bold";
-                    document.getElementById('paymentSection').classList.add('hidden'); // Free අයට Payment Card එක හංගනවා
+                    document.getElementById('paymentSection').classList.add('hidden');
                 } else {
                     document.getElementById('dashFee').innerText = "Rs. 200.00";
                     document.getElementById('dashFee').className = "text-yellow-500 font-bold";
-                    document.getElementById('paymentSection').classList.remove('hidden'); // සල්ලි ගෙවන අයට විතරක් පෙන්වනවා
+                    document.getElementById('paymentSection').classList.remove('hidden');
                 }
-                
                 loadLeaderboard();
             } else {
                 document.getElementById('dashboardScreen').classList.add('hidden');
@@ -343,7 +343,6 @@
             switchToScreen(false);
         }
 
-        // === 🏆 LOAD LEADERBOARD WITH GAMER BADGES ===
         async function loadLeaderboard() {
             try {
                 const response = await fetch(`${API_URL}/api/leaderboard`);
@@ -363,13 +362,11 @@
                     
                     if (index === 0) { 
                         rowClass = "bg-yellow-500/5 font-bold text-yellow-400"; 
-                        badgeHTML = `<span class="gaming-font text-xs bg-gradient-to-r from-amber-500 to-yellow-400 text-black px-2.5 py-1 rounded font-black tracking-wide shadow-[0_0_10px_rgba(234,179,8,0.2)]">🥇 MVP</span>`;
-                    }
-                    else if (index === 1) { 
+                        badgeHTML = `<span class="gaming-font text-xs bg-gradient-to-r from-amber-500 to-yellow-400 text-black px-2.5 py-1 rounded font-black tracking-wide">🥇 MVP</span>`;
+                    } else if (index === 1) { 
                         rowClass = "bg-zinc-400/5 font-bold text-gray-300"; 
                         badgeHTML = `<span class="gaming-font text-xs bg-gradient-to-r from-zinc-400 to-gray-200 text-black px-2.5 py-1 rounded font-black tracking-wide">🥈 ELITE</span>`;
-                    }
-                    else if (index === 2) { 
+                    } else if (index === 2) { 
                         rowClass = "bg-amber-700/5 font-bold text-amber-500"; 
                         badgeHTML = `<span class="gaming-font text-xs bg-gradient-to-r from-amber-700 to-amber-600 text-white px-2.5 py-1 rounded font-black tracking-wide">🥉 PRO</span>`;
                     }
@@ -377,9 +374,7 @@
                     tbody.innerHTML += `
                         <tr class="${rowClass} border-b border-zinc-950/40">
                             <td class="py-4 px-2 text-center">${badgeHTML}</td>
-                            <td class="py-4 px-4 font-semibold flex items-center gap-2">
-                                <span class="text-zinc-600 text-xs">🎮</span> ${player.ff_name}
-                            </td>
+                            <td class="py-4 px-4 font-semibold flex items-center gap-2">👤 ${player.ff_name}</td>
                             <td class="py-4 px-4 text-gray-400 hidden sm:table-cell tracking-wider">${player.ff_id}</td>
                             <td class="py-4 px-4 text-right font-bold text-orange-500 gaming-font text-base neon-text">${player.points}</td>
                         </tr>
@@ -388,7 +383,6 @@
             } catch (error) { console.error("Error loading standings:", error); }
         }
 
-        // === 📝 REGISTER FORM SUBMIT ===
         document.getElementById('regForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('regBtn');
@@ -417,19 +411,18 @@
                     setTimeout(() => switchAuth(true), 2500);
                 } else {
                     msgEl.className = "mt-4 text-center text-xs font-semibold block text-red-400 bg-red-500/10 p-3 rounded-lg border border-red-500/20";
-                    msgEl.innerText = data.message || "Registration Failed!";
+                    msgEl.innerText = data.message;
                 }
             } catch (error) { 
                 msgEl.className = "mt-4 text-center text-xs font-semibold block text-red-400 bg-red-500/10 p-3 rounded-lg border border-red-500/20";
                 msgEl.innerText = "Network transmission failed!"; 
-            }
-            finally {
+            } finally {
                 btn.disabled = false;
                 btn.innerHTML = `<span>Register</span>`;
             }
         });
 
-        // === 🔑 LOGIN FORM SUBMIT ===
+        // === 🔑 LOGIN FORM WITH ACTIVE BAN CHECK ===
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('loginBtn');
@@ -450,6 +443,15 @@
                 const data = await response.json();
 
                 if (response.ok) {
+                    // 🛡️ ලොග් වෙන්න හදද්දීම ප්ලේයර් Ban ද කියලා බලනවා
+                    if (data.player && data.player.isBanned === true) { 
+                        msgEl.className = "mt-4 text-center text-xs font-semibold block text-red-400 bg-red-500/10 p-3 rounded-lg border border-red-500/20 blink-animation";
+                        msgEl.innerText = "🚫 YOUR ACCOUNT HAS BEEN BANNED BY ADMIN!";
+                        btn.disabled = false;
+                        btn.innerHTML = `<span>Login</span>`;
+                        return;
+                    }
+
                     setTimeout(() => {
                         localStorage.setItem('ff_player', JSON.stringify(data.player));
                         switchToScreen(true, data.player);
@@ -468,10 +470,14 @@
             }
         });
 
+        // === 🔄 AUTOMATED REAL-TIME INTERACTION LOOP ===
         window.onload = function() {
             checkSession();
-            fetchTournamentSettings(); // 📡 සර්වර් එකෙන් ලයිව් සෙටින්ග්ස් ඇදලා ගන්නවා
-            setInterval(fetchTournamentSettings, 10000); // 🔄 හැම තත්පර 10කට සැරයක්ම auto-update වෙනවා සර්වර් එකෙන්
+            fetchTournamentSettings(); 
+            
+            // තත්පර 10න් 10ට සේවා දත්ත සහ ප්ලේයර්ගේ Ban Status එක Auto update කරනවා
+            setInterval(fetchTournamentSettings, 10000); 
+            setInterval(checkCurrentPlayerStatus, 10000); 
         };
     </script>
 </body>
