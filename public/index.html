@@ -55,14 +55,12 @@
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Free Fire UID (Game ID)</label>
-                    <div class="relative">
-                        <input type="text" id="reg_id" oninput="autoVerifyUID()" placeholder="Enter Free Fire UID..." required class="w-full bg-gray-950 border border-gray-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500">
-                        <div id="uidLoader" class="absolute right-3 top-3 hidden"><div class="spinner !w-5 !height-5"></div></div>
-                    </div>
+                    <input type="number" id="reg_id" placeholder="Enter Free Fire UID..." required class="w-full bg-gray-950 border border-gray-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Free Fire Name (Auto-Fetched)</label>
-                    <input type="text" id="reg_name" placeholder="Type your ID above to auto-fetch..." required readonly class="w-full bg-gray-900 border border-gray-800 rounded-lg p-3 text-sm text-gray-400 cursor-not-allowed focus:outline-none">
+                    <!-- 📝 මෙතන පරණ readonly කෑල්ල අයින් කරලා ප්ලේයර්ට නම ගහන්න දුන්නා -->
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Free Fire In-Game Name</label>
+                    <input type="text" id="reg_name" placeholder="Enter your exact Free Fire Name" required class="w-full bg-gray-950 border border-gray-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500">
                 </div>
                 <button type="submit" id="regBtn" class="w-full gaming-font bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 text-white font-black py-3 rounded-lg text-sm uppercase tracking-wider transition-all flex justify-center items-center gap-2">
                     <span>Register</span>
@@ -93,7 +91,6 @@
             <p id="loginMessage" class="mt-4 text-center text-xs font-semibold hidden"></p>
         </div>
     </div>
-
 
     <div id="dashboardScreen" class="hidden flex-grow">
         <header class="text-center py-5 px-4 border-b border-red-900/20 bg-black/50 backdrop-blur-md flex justify-between items-center max-w-7xl mx-auto w-full">
@@ -145,8 +142,9 @@
     </div>
 
     <script>
-        
-        const API_URL = "";
+        // 🚀 Render එකේ සජීවී ලින්ක් එක
+        const API_URL = "https://ff-tournament-k4gk.onrender.com";
+
         function switchAuth(showLogin) {
             document.getElementById('loginBox').classList.toggle('hidden', !showLogin);
             document.getElementById('registerBox').classList.toggle('hidden', showLogin);
@@ -181,54 +179,7 @@
             switchToScreen(false);
         }
 
-        // === 💥 NEW: 100% AUTO FETCH NICKNAME LOGIC (NO BUTTON NEEDED) ===
-        let typingTimer;
-        function autoVerifyUID() {
-            clearTimeout(typingTimer);
-            const uidInput = document.getElementById('reg_id').value.trim();
-            const nameInput = document.getElementById('reg_name');
-            const msgEl = document.getElementById('regMessage');
-            const loader = document.getElementById('uidLoader');
-
-            // සාමාන්‍යයෙන් FF ID එකක් ඉලක්කම් 8ත් 12ත් අතර වෙනවා. 
-            // ඒ නිසා ඉලක්කම් 8කට වඩා වැඩි වුණාම විතරක් චෙක් කරන්න පටන් ගන්නවා.
-            if (uidInput.length >= 8) {
-                // ප්ලේයර් ටයිප් කරලා ඉවර වෙලා මිලි තත්පර 800ක් යනකන් ඉන්නවා (Debounce)
-                typingTimer = setTimeout(async () => {
-                    loader.classList.remove('hidden');
-                    msgEl.classList.add('hidden');
-                    nameInput.value = "Fetching Nickname...";
-
-                    try {
-                        const response = await fetch(`${API_URL}/api/check-uid`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ uid: uidInput })
-                        });
-                        const data = await response.json();
-
-                        if (response.ok && data.nickname) {
-                            nameInput.value = data.nickname;
-                            msgEl.className = "mt-4 text-center text-xs font-semibold block text-green-400 bg-green-500/10 p-2 rounded-lg border border-green-500/20";
-                            msgEl.innerText = `✅ Verified Player: ${data.nickname}`;
-                        } else {
-                            msgEl.className = "mt-4 text-center text-xs font-semibold block text-red-400 bg-red-500/10 p-2 rounded-lg border border-red-500/20";
-                            msgEl.innerText = "❌ Invalid Player ID! Please check again.";
-                            nameInput.value = "";
-                        }
-                    } catch (error) {
-                        msgEl.className = "mt-4 text-center text-xs font-semibold block text-red-400 bg-red-500/10 p-2 rounded-lg border border-red-500/20";
-                        msgEl.innerText = "Verification connection failed!";
-                        nameInput.value = "";
-                    } finally {
-                        loader.classList.add('hidden');
-                    }
-                }, 800); 
-            } else {
-                nameInput.value = "Type your ID above to auto-fetch...";
-                msgEl.classList.add('hidden');
-            }
-        }
+        // ❌ පරණ කරදරකාරී autoVerifyUID() ෆන්ක්ෂන් එක සම්පූර්ණයෙන්ම අයින් කරලා දැම්මා.
 
         async function loadLeaderboard() {
             try {
@@ -261,23 +212,19 @@
             } catch (error) { console.error("Error loading standings:", error); }
         }
 
+        // === 📝 REGISTER FORM SUBMIT ===
         document.getElementById('regForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('regBtn');
             const msgEl = document.getElementById('regMessage');
             
-            const ff_name = document.getElementById('reg_name').value;
-            if(!ff_name || ff_name === "Type your ID above to auto-fetch..." || ff_name === "Fetching Nickname...") {
-                alert("කරුණාකර නිවැරදි Free Fire ID එකක් ඇතුළත් කර Nickname එක auto-load වන තෙක් සිටින්න!");
-                return;
-            }
+            const whatsapp = document.getElementById('reg_whatsapp').value.trim();
+            const password = document.getElementById('reg_password').value.trim();
+            const ff_id = document.getElementById('reg_id').value.trim();
+            const ff_name = document.getElementById('reg_name').value.trim(); // 👈 ප්ලේයර් අතින් ගහන නම මෙතනින් ගන්නවා
 
             btn.disabled = true;
             btn.innerHTML = `<div class="spinner"></div> <span>Processing...</span>`;
-
-            const whatsapp = document.getElementById('reg_whatsapp').value;
-            const password = document.getElementById('reg_password').value;
-            const ff_id = document.getElementById('reg_id').value;
 
             try {
                 const response = await fetch(`${API_URL}/api/register`, {
@@ -289,20 +236,24 @@
 
                 if (response.ok) {
                     msgEl.className = "mt-4 text-center text-xs font-semibold block text-green-400 bg-green-500/10 p-3 rounded-lg border border-green-500/20";
-                    msgEl.innerText = data.message;
+                    msgEl.innerText = data.message || "Registration Successful!";
                     document.getElementById('regForm').reset();
                     setTimeout(() => switchAuth(true), 2500);
                 } else {
                     msgEl.className = "mt-4 text-center text-xs font-semibold block text-red-400 bg-red-500/10 p-3 rounded-lg border border-red-500/20";
-                    msgEl.innerText = data.message;
+                    msgEl.innerText = data.message || "Registration Failed!";
                 }
-            } catch (error) { msgEl.innerText = "Network transmission failed!"; }
+            } catch (error) { 
+                msgEl.className = "mt-4 text-center text-xs font-semibold block text-red-400 bg-red-500/10 p-3 rounded-lg border border-red-500/20";
+                msgEl.innerText = "Network transmission failed!"; 
+            }
             finally {
                 btn.disabled = false;
                 btn.innerHTML = `<span>Register</span>`;
             }
         });
 
+        // === 🔑 LOGIN FORM SUBMIT ===
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('loginBtn');
@@ -311,8 +262,8 @@
             btn.disabled = true;
             btn.innerHTML = `<div class="spinner"></div> <span>Verifying...</span>`;
 
-            const whatsapp = document.getElementById('log_whatsapp').value;
-            const password = document.getElementById('log_password').value;
+            const whatsapp = document.getElementById('log_whatsapp').value.trim();
+            const password = document.getElementById('log_password').value.trim();
 
             try {
                 const response = await fetch(`${API_URL}/api/login`, {
@@ -334,6 +285,7 @@
                     btn.innerHTML = `<span>Login</span>`;
                 }
             } catch (error) { 
+                msgEl.className = "mt-4 text-center text-xs font-semibold block text-red-400 bg-red-500/10 p-3 rounded-lg border border-red-500/20";
                 msgEl.innerText = "Network verification error!"; 
                 btn.disabled = false;
                 btn.innerHTML = `<span>Login</span>`;
