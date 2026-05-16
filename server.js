@@ -31,7 +31,7 @@ mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log("MongoDB Connected..."))
     .catch(err => console.log(err));
 
-// === 💾 PLAYER SCHEMA (UPDATED WITH PAYMENT FIELDS) ===
+// === 💾 PLAYER SCHEMA ===
 const playerSchema = new mongoose.Schema({
     whatsapp: { type: String, required: true, unique: true },
     password: { type: String, required: true },
@@ -40,14 +40,14 @@ const playerSchema = new mongoose.Schema({
     points: { type: Number, default: 0 },
     reg_fee: { type: Number, default: 200 },
     registered_at: { type: Date, default: Date.now },
-    isBanned: { type: Boolean, default: false }, // Admin panel එකට අවශ්‍ය නිසා Schema එකටම දැම්මා
-    payment_slip: { type: String, default: "" },   // 🆕 රිසිට් එකේ ලින්ක් එක සේဝ် වෙන්න
-    payment_status: { type: String, default: "Pending" } // 🆕 Pending, Approved, Free
+    isBanned: { type: Boolean, default: false },
+    payment_slip: { type: String, default: "" },   
+    payment_status: { type: String, default: "Pending" } 
 });
 
 const Player = mongoose.model('Player', playerSchema);
 
-// === 💾 1. PLAYER REGISTRATION ROUTE (FIRST 10 FREE LOGIC) ===
+// === 💾 1. PLAYER REGISTRATION ROUTE ===
 app.post('/api/register', async (req, res) => {
     try {
         const { whatsapp, password, ff_name, ff_id } = req.body;
@@ -56,19 +56,16 @@ app.post('/api/register', async (req, res) => {
             return res.status(400).json({ message: "All fields are required! ❌" });
         }
 
-        // එකම WhatsApp අංකයකින් දෙපාරක් රෙජිස්ටර් වෙන්න බෑ
         const existingPlayer = await Player.findOne({ whatsapp: whatsapp });
         if (existingPlayer) {
             return res.status(400).json({ message: "This WhatsApp number is already registered! ❌" });
         }
 
-        // එකම FF ID එකෙන් දෙපාරක් රෙජිස්ටර් වෙන්න බෑ
         const existingFF = await Player.findOne({ ff_id: ff_id });
         if (existingFF) {
             return res.status(400).json({ message: "This Free Fire ID is already registered! ❌" });
         }
 
-        // 📊 10 Slots Logic එක මෙතනින් ක්‍රියාත්මක වෙනවා:
         const playerCount = await Player.countDocuments({});
         let finalFee = 200;
         let finalStatus = "Pending";
@@ -78,7 +75,6 @@ app.post('/api/register', async (req, res) => {
             finalStatus = "Free";
         }
 
-        // අලුත් ප්ලේයර්ව සේව් කිරීම
         const newPlayer = new Player({ 
             whatsapp, 
             password, 
@@ -102,7 +98,7 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-// === 🔐 2. LOGIN API (UPDATED PROVIDING BAN STATUS) ===
+// === 🔐 2. LOGIN API ===
 app.post('/api/login', async (req, res) => {
     try {
         const { whatsapp, password } = req.body;
@@ -122,7 +118,7 @@ app.post('/api/login', async (req, res) => {
                 reg_fee: player.reg_fee,
                 payment_status: player.payment_status, 
                 payment_slip: player.payment_slip,
-                isBanned: player.isBanned // ✨ Frontend එකෙන් ලොගින් වෙද්දීම Ban ද කියලා බලන්න මෙතනට එකතු කරා
+                isBanned: player.isBanned 
             }
         });
     } catch (err) {
@@ -130,21 +126,25 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// === 🛡️ 2.1 [NEW] ⚡ CURRENT PLAYER STATUS CHECK API FOR AUTO-KICK ===
-// Frontend එකෙන් තත්පර 10න් 10ට මේකට කෝල් කරලා ප්ලේයර් Ban ද කියලා Live චෙක් කරනවා
+// === 🛡️ 2.1 [UPDATED FIXED] ⚡ AUTO-REFRESH PLAYER STATUS CHECK API ===
+// Frontend එකෙන් තත්පර 10න් 10ට කෝල් කරද්දී ප්ලේයර්ගේ නම, පොයින්ට්ස් සේරම අප්ඩේට් වෙන්න මෙතනින් හැම ඩේටා එකක්ම යවනවා.
 app.get('/api/players/:whatsapp', async (req, res) => {
     try {
         const { whatsapp } = req.params;
         const player = await Player.findOne({ whatsapp });
         
-        // ප්ලේයර් කෙනෙක් Database එකේ නැත්නම් (Admin එයාව සදහටම Delete කරලා නම්)
         if (!player) {
             return res.status(404).json({ isBanned: true, message: "Account deleted by Admin" });
         }
         
-        // ප්ලේයර්ගේ වත්මන් Ban තත්වය විතරක් සරලව යවනවා
+        // ✨ මෙන්න මෙතනට අපි අනෙක් හැම විස්තරයක්ම එකතු කරා (එතකොට undefined වෙන්නේ නෑ)
         res.json({
             whatsapp: player.whatsapp,
+            ff_name: player.ff_name,
+            ff_id: player.ff_id,
+            points: player.points,
+            reg_fee: player.reg_fee,
+            payment_status: player.payment_status,
             isBanned: player.isBanned
         });
     } catch (err) {
@@ -158,7 +158,6 @@ app.post('/api/admin/players', async (req, res) => {
     if (adminPassword !== "admin123") return res.status(403).json({ message: "Invalid Admin Password!" });
 
     try {
-        // 🆕 payment_slip සහ payment_status එකත් ඇඩ්මින්ට පේන්න මෙතනට ඇඩ් කරා
         const players = await Player.find({}, 'whatsapp ff_name ff_id points reg_fee registered_at isBanned payment_slip payment_status').sort({ points: -1 });
         res.json(players);
     } catch (err) {
