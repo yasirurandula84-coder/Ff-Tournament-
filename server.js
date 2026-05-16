@@ -29,29 +29,28 @@ const playerSchema = new mongoose.Schema({
 
 const Player = mongoose.model('Player', playerSchema);
 
-// === 🎯 NEW RAPIDAPI INTEGRATION FOR FREE FIRE ID CHECK ===
+// === 🎯 NEW RAPIDAPI INTEGRATION FOR FREE FIRE ID CHECK (FIXED) ===
 app.post('/api/check-uid', async (req, res) => {
     try {
         const { uid } = req.body;
         if (!uid) return res.status(400).json({ message: "UID එක ඇතුළත් කරන්න!" });
 
-        // ඔයා දුන්න නිවැරදිම RapidAPI එකේ විස්තර මෙතනට සෙට් කලා
         const options = {
             method: 'GET',
             url: `https://check-id-game3.p.rapidapi.com/game/free-fire?id=${uid}`,
             headers: {
                 'x-rapidapi-host': 'check-id-game3.p.rapidapi.com',
-                'x-rapidapi-key': 'ed9848b3fcmshe0244ae6d11d7fcp1f91aejsnec4d605515bc' // අපි මේක ආරක්ෂිතව Render Environment Variables වලට දාමු
+                'x-rapidapi-key': 'ed9848b3fcmshe0244ae6d11d7fcp1f91aejsnec4d605515bc'
             }
         };
 
         const response = await axios.request(options);
+        console.log("Garena API Response:", response.data);
         
-        // සාමාන්‍යයෙන් මේ API වලින් එන්නේ { nickname: "name" } හෝ { username: "name" } හෝ { data: { username: "name" } } වගේ
-        // ඒ නිසා ආපු response එක පරීක්ෂා කරලා නම ගන්නවා:
+        // API එකෙන් නම එවන්නේ response.data.username විදිහටයි
         let nickname = null;
-        if (response.data) {
-            nickname = response.data.nickname || response.data.username || response.data.name || (response.data.data && response.data.data.username);
+        if (response.data && response.data.username) {
+            nickname = response.data.username;
         }
 
         if (nickname) {
