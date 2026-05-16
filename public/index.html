@@ -9,11 +9,11 @@
     <style>
         body {
             font-family: 'Rajdhani', sans-serif;
-            background: radial-gradient(circle at center, #150804 0%, #050201 100%);
+            background: radial-gradient(circle at center, #1a0a05 0%, #050201 100%);
         }
         .gaming-font { font-family: 'Orbitron', sans-serif; }
-        .neon-border { box-shadow: 0 0 15px rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); }
-        .neon-text { text-shadow: 0 0 10px rgba(249, 115, 22, 0.5); }
+        .neon-border { box-shadow: 0 0 20px rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .neon-text { text-shadow: 0 0 12px rgba(249, 115, 22, 0.6); }
         
         .spinner {
             border: 3px solid rgba(255, 255, 255, 0.1);
@@ -28,41 +28,71 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* ✨ NEW GAMING EFFECTS */
+        .blink-animation { animation: blink 1.5s infinite; }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .gaming-card {
+            background: linear-gradient(135deg, rgba(20,20,20,0.95) 0%, rgba(5,5,5,0.98) 100%);
+            border-left: 4px solid #f97316;
+        }
+        
+        input:focus {
+            box-shadow: inset 0 0 10px rgba(249, 115, 22, 0.2), 0 0 10px rgba(249, 115, 22, 0.2);
+        }
     </style>
 </head>
 <body class="flex flex-col min-h-screen justify-between text-gray-100">
 
+    <!-- ================= AUTH SCREEN ================= -->
     <div id="authScreen" class="flex-grow flex flex-col items-center justify-center px-4 py-12">
-        <div class="text-center mb-8">
+        <div class="text-center mb-6">
+            <div class="inline-flex items-center gap-2 bg-red-500/10 border border-red-500/30 text-red-500 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-3 blink-animation">
+                <span class="w-2 h-2 rounded-full bg-red-500 block"></span> Registration Open
+            </div>
             <h1 class="gaming-font text-4xl md:text-5xl font-black tracking-wider text-orange-500 neon-text uppercase">
                 FF TOURNAMENT HUB
             </h1>
             <p class="text-xs text-gray-500 uppercase tracking-widest mt-1">Ultimate Player Dashboard</p>
         </div>
 
-        <div id="registerBox" class="w-full max-w-md bg-black/60 p-8 rounded-2xl neon-border backdrop-blur-md">
-            <h2 class="gaming-font text-xl font-bold text-orange-500 mb-5 border-b border-orange-500/20 pb-2 uppercase">
-                🛡️ Create Account
+        <!-- ⏳ COUNTDOWN TIMER CONTAINER -->
+        <div class="w-full max-w-md bg-zinc-950/40 border border-zinc-800/60 p-4 rounded-xl backdrop-blur-md mb-6 text-center">
+            <p class="text-xs uppercase font-bold text-gray-400 tracking-wider mb-2">🔥 NEXT MAJOR TOURNAMENT STARTS IN</p>
+            <div class="grid grid-cols-3 gap-2 gaming-font text-xl font-black text-orange-500" id="countdown">
+                <div class="bg-black/50 p-2 rounded border border-zinc-900"><span id="cd_hours">00</span><p class="text-[9px] font-normal text-gray-500 tracking-normal mt-0.5">HOURS</p></div>
+                <div class="bg-black/50 p-2 rounded border border-zinc-900"><span id="cd_mins">00</span><p class="text-[9px] font-normal text-gray-500 tracking-normal mt-0.5">MINS</p></div>
+                <div class="bg-black/50 p-2 rounded border border-zinc-900"><span id="cd_secs">00</span><p class="text-[9px] font-normal text-gray-500 tracking-normal mt-0.5">SECS</p></div>
+            </div>
+        </div>
+
+        <!-- 🛡️ REGISTER BOX -->
+        <div id="registerBox" class="w-full max-w-md bg-black/60 p-8 rounded-2xl neon-border backdrop-blur-md transition-all duration-500 hover:shadow-[0_0_25px_rgba(249,115,22,0.15)]">
+            <h2 class="gaming-font text-xl font-bold text-orange-500 mb-5 border-b border-orange-500/20 pb-2 uppercase flex items-center gap-2">
+                <span>🛡️ Create Account</span>
             </h2>
             <form id="regForm" class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-400 uppercase mb-1">WhatsApp Number</label>
-                    <input type="text" id="reg_whatsapp" placeholder="947XXXXXXXX" required class="w-full bg-gray-950 border border-gray-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500">
+                    <input type="text" id="reg_whatsapp" placeholder="947XXXXXXXX" required class="w-full bg-gray-950 border border-zinc-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500 transition-all">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Create Password</label>
-                    <input type="password" id="reg_password" placeholder="••••••••" required class="w-full bg-gray-950 border border-gray-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500">
+                    <input type="password" id="reg_password" placeholder="••••••••" required class="w-full bg-gray-950 border border-zinc-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500 transition-all">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Free Fire UID (Game ID)</label>
-                    <input type="number" id="reg_id" placeholder="Enter Free Fire UID..." required class="w-full bg-gray-950 border border-gray-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500">
+                    <input type="number" id="reg_id" placeholder="Enter Free Fire UID..." required class="w-full bg-gray-950 border border-zinc-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500 transition-all">
                 </div>
                 <div>
-                    <!-- 📝 මෙතන පරණ readonly කෑල්ල අයින් කරලා ප්ලේයර්ට නම ගහන්න දුන්නා -->
                     <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Free Fire In-Game Name</label>
-                    <input type="text" id="reg_name" placeholder="Enter your exact Free Fire Name" required class="w-full bg-gray-950 border border-gray-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500">
+                    <input type="text" id="reg_name" placeholder="Enter your exact Free Fire Name" required class="w-full bg-gray-950 border border-zinc-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500 transition-all">
                 </div>
-                <button type="submit" id="regBtn" class="w-full gaming-font bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 text-white font-black py-3 rounded-lg text-sm uppercase tracking-wider transition-all flex justify-center items-center gap-2">
+                <button type="submit" id="regBtn" class="w-full gaming-font bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 text-white font-black py-3 rounded-lg text-sm uppercase tracking-wider transition-all flex justify-center items-center gap-2 shadow-lg shadow-red-900/20">
                     <span>Register</span>
                 </button>
             </form>
@@ -70,20 +100,21 @@
             <p id="regMessage" class="mt-4 text-center text-xs font-semibold hidden"></p>
         </div>
 
-        <div id="loginBox" class="w-full max-w-md bg-black/60 p-8 rounded-2xl neon-border backdrop-blur-md hidden">
+        <!-- 🔑 LOGIN BOX -->
+        <div id="loginBox" class="w-full max-w-md bg-black/60 p-8 rounded-2xl neon-border backdrop-blur-md hidden transition-all duration-500 hover:shadow-[0_0_25px_rgba(239,68,68,0.15)]">
             <h2 class="gaming-font text-xl font-bold text-orange-500 mb-5 border-b border-orange-500/20 pb-2 uppercase">
                 🔑 Player Login
             </h2>
             <form id="loginForm" class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-400 uppercase mb-1">WhatsApp Number</label>
-                    <input type="text" id="log_whatsapp" placeholder="947XXXXXXXX" required class="w-full bg-gray-950 border border-gray-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500">
+                    <input type="text" id="log_whatsapp" placeholder="947XXXXXXXX" required class="w-full bg-gray-950 border border-zinc-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500 transition-all">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Password</label>
-                    <input type="password" id="log_password" placeholder="••••••••" required class="w-full bg-gray-950 border border-gray-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500">
+                    <input type="password" id="log_password" placeholder="••••••••" required class="w-full bg-gray-950 border border-zinc-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500 transition-all">
                 </div>
-                <button type="submit" id="loginBtn" class="w-full gaming-font bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 text-white font-black py-3 rounded-lg text-sm uppercase tracking-wider transition-all flex justify-center items-center gap-2">
+                <button type="submit" id="loginBtn" class="w-full gaming-font bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 text-white font-black py-3 rounded-lg text-sm uppercase tracking-wider transition-all flex justify-center items-center gap-2 shadow-lg shadow-orange-900/20">
                     <span>Login</span>
                 </button>
             </form>
@@ -92,46 +123,77 @@
         </div>
     </div>
 
+
+    <!-- ================= DASHBOARD SCREEN ================= -->
     <div id="dashboardScreen" class="hidden flex-grow">
-        <header class="text-center py-5 px-4 border-b border-red-900/20 bg-black/50 backdrop-blur-md flex justify-between items-center max-w-7xl mx-auto w-full">
-            <h1 class="gaming-font text-xl md:text-3xl font-black tracking-wider text-orange-500 neon-text uppercase">HUB MAINBOARD</h1>
-            <button onclick="logout()" class="gaming-font text-xs bg-red-600 hover:bg-red-500 text-white font-bold px-4 py-2 rounded uppercase tracking-wide transition-all">Logout 🚪</button>
+        <header class="py-5 px-4 border-b border-zinc-900 bg-black/50 backdrop-blur-md">
+            <div class="max-w-7xl mx-auto w-full flex justify-between items-center">
+                <h1 class="gaming-font text-xl md:text-3xl font-black tracking-wider text-orange-500 neon-text uppercase">HUB MAINBOARD</h1>
+                <button onclick="logout()" class="gaming-font text-xs bg-red-600 hover:bg-red-500 text-white font-bold px-4 py-2 rounded uppercase tracking-wide transition-all">Logout 🚪</button>
+            </div>
         </header>
 
-        <main class="max-w-7xl mx-auto px-4 mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8 pb-12">
+        <!-- 📡 LIVE MATCH TICKER PANEL -->
+        <div class="max-w-7xl mx-auto px-4 mt-6">
+            <div class="bg-zinc-950/60 border border-zinc-900 rounded-xl p-3 flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <span class="bg-red-600 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded blink-animation">LIVE</span>
+                    <p class="text-xs md:text-sm text-gray-300 font-medium tracking-wide">⚔️ WEEKLY GRAND FINALS: MATCH ROOM IS FORMING NOW!</p>
+                </div>
+                <div class="text-xs text-gray-500 font-semibold uppercase">MAP: BERMUDA (CLASSIC)</div>
+            </div>
+        </div>
+
+        <main class="max-w-7xl mx-auto px-4 mt-6 grid grid-cols-1 lg:grid-cols-3 gap-8 pb-12">
+            <!-- PROFILE SECTION -->
             <section class="lg:col-span-1">
-                <div class="bg-black/80 p-6 rounded-2xl border border-green-500/30 shadow-[0_0_15px_rgba(34,197,94,0.05)] backdrop-blur-md">
-                    <h2 class="gaming-font text-base font-bold text-green-400 mb-4 border-b border-green-500/20 pb-2 uppercase">🎮 Player Profile</h2>
+                <div class="gaming-card p-6 rounded-2xl border border-zinc-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.4)] backdrop-blur-md">
+                    <h2 class="gaming-font text-base font-bold text-orange-500 mb-4 border-b border-zinc-800 pb-2 uppercase flex items-center gap-2">
+                        <span>🎮 PLAYER PROFILE</span>
+                    </h2>
                     <div class="space-y-4 text-sm">
-                        <div class="flex justify-between border-b border-gray-900 pb-2"><span class="text-gray-400">In-Game Name:</span> <b id="dashName" class="text-white text-base">--</b></div>
-                        <div class="flex justify-between border-b border-gray-900 pb-2"><span class="text-gray-400">Free Fire ID:</span> <b id="dashID" class="text-white">--</b></div>
-                        <div class="flex justify-between border-b border-gray-900 pb-2"><span class="text-gray-400">Total Points:</span> <b id="dashPoints" class="text-orange-500 text-2xl font-black gaming-font">0</b></div>
-                        <div class="flex justify-between border-b border-gray-900 pb-2"><span class="text-gray-400">Entry Status:</span> <b id="dashFee" class="text-white">--</b></div>
+                        <div class="flex justify-between border-b border-zinc-900/60 pb-2">
+                            <span class="text-gray-400 flex items-center gap-1.5">👤 Name:</span> 
+                            <b id="dashName" class="text-white text-base font-bold">--</b>
+                        </div>
+                        <div class="flex justify-between border-b border-zinc-900/60 pb-2">
+                            <span class="text-gray-400 flex items-center gap-1.5">🆔 UID:</span> 
+                            <b id="dashID" class="text-white tracking-wider">--</b>
+                        </div>
+                        <div class="flex justify-between border-b border-zinc-900/60 pb-2">
+                            <span class="text-gray-400 flex items-center gap-1.5">🔥 Rank Points:</span> 
+                            <b id="dashPoints" class="text-orange-500 text-2xl font-black gaming-font neon-text">0</b>
+                        </div>
+                        <div class="flex justify-between border-b border-zinc-900/60 pb-2">
+                            <span class="text-gray-400 flex items-center gap-1.5">🎟️ Entry Slot:</span> 
+                            <b id="dashFee" class="text-white">--</b>
+                        </div>
                     </div>
-                    <div class="mt-6 pt-4 border-t border-gray-900 text-center">
+                    <div class="mt-6 pt-4 border-t border-zinc-900 text-center">
                         <p class="text-xs text-gray-400 mb-2">👇 Join with official match group</p>
-                        <a href="https://chat.whatsapp.com/ඔයාගේ_ගෲප්_ලින්ක්_එක" target="_blank" class="block gaming-font bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg text-sm uppercase tracking-wider transition-all">💬 Join WhatsApp Group</a>
+                        <a href="https://chat.whatsapp.com/ඔයාගේ_ගෲප්_ලින්ක්_එක" target="_blank" class="block gaming-font bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg text-sm uppercase tracking-wider transition-all shadow-md shadow-green-950/20">💬 Join WhatsApp Group</a>
                     </div>
                 </div>
             </section>
 
+            <!-- LEADERBOARD SECTION -->
             <section class="lg:col-span-2">
-                <div class="bg-black/60 p-6 rounded-2xl neon-border backdrop-blur-md min-h-[450px]">
-                    <div class="flex justify-between items-center mb-5 border-b border-red-500/20 pb-2">
+                <div class="bg-black/60 p-6 rounded-2xl neon-border backdrop-blur-md min-h-[450px] transition-all hover:shadow-[0_0_25px_rgba(239,68,68,0.05)]">
+                    <div class="flex justify-between items-center mb-5 border-b border-zinc-800 pb-2">
                         <h2 class="gaming-font text-base md:text-lg font-black text-red-500 uppercase tracking-wide">🏆 TOURNAMENT STANDINGS</h2>
-                        <button onclick="loadLeaderboard()" class="text-xs bg-gray-900 hover:bg-gray-800 px-3 py-1.5 rounded-md text-gray-400 border border-gray-800 transition-all">🔄 Refresh</button>
+                        <button onclick="loadLeaderboard()" class="text-xs bg-zinc-950 hover:bg-zinc-900 px-3 py-1.5 rounded-md text-gray-400 border border-zinc-800 transition-all">🔄 Refresh Table</button>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
-                                <tr class="border-b border-gray-900 text-gray-500 uppercase text-xs font-bold tracking-wider">
-                                    <th class="py-3 px-2 text-center w-12">Rank</th>
+                                <tr class="border-b border-zinc-800 text-gray-500 uppercase text-xs font-bold tracking-wider">
+                                    <th class="py-3 px-2 text-center w-16">Rank</th>
                                     <th class="py-3 px-4">Player Name</th>
                                     <th class="py-3 px-4 hidden sm:table-cell">Free Fire ID</th>
                                     <th class="py-3 px-4 text-right">Points</th>
                                 </tr>
                             </thead>
-                            <tbody id="leaderboardBody" class="divide-y divide-gray-950 text-sm">
+                            <tbody id="leaderboardBody" class="divide-y divide-zinc-950 text-sm">
                                 <tr><td colspan="4" class="text-center py-8 text-gray-500">Loading standings data...</td></tr>
                             </tbody>
                         </table>
@@ -142,8 +204,35 @@
     </div>
 
     <script>
-        // 🚀 Render එකේ සජීවී ලින්ක් එක
         const API_URL = "https://ff-tournament-k4gk.onrender.com";
+
+        // === ⏳ LIVE COUNTDOWN TIMER LOGIC ===
+        function startCountdown() {
+            // මෙතනට ඔයාගේ ඊළඟ මැච් එක තියෙන දවස දාන්න (Year, Month index [0-11], Day, Hour, Minute)
+            // දැනට මම පැය 24ක සරල ලූප් එකක් දැම්මා පේන්න
+            const targetTime = new Date();
+            targetTime.setHours(targetTime.getHours() + 18); // දැනට පැය 18ක් පෙන්වයි
+
+            function updateTimer() {
+                const now = new Date().getTime();
+                const diff = targetTime - now;
+
+                if (diff <= 0) {
+                    document.getElementById('countdown').innerHTML = "<div class='col-span-3 text-center text-red-500 blink-animation'>MATCH STARTED! GO TO DASHBOARD</div>";
+                    return;
+                }
+
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+                document.getElementById('cd_hours').innerText = hours.toString().padStart(2, '0');
+                document.getElementById('cd_mins').innerText = mins.toString().padStart(2, '0');
+                document.getElementById('cd_secs').innerText = secs.toString().padStart(2, '0');
+            }
+            setInterval(updateTimer, 1000);
+            updateTimer();
+        }
 
         function switchAuth(showLogin) {
             document.getElementById('loginBox').classList.toggle('hidden', !showLogin);
@@ -179,8 +268,7 @@
             switchToScreen(false);
         }
 
-        // ❌ පරණ කරදරකාරී autoVerifyUID() ෆන්ක්ෂන් එක සම්පූර්ණයෙන්ම අයින් කරලා දැම්මා.
-
+        // === 🏆 LOAD LEADERBOARD WITH GAMER BADGES ===
         async function loadLeaderboard() {
             try {
                 const response = await fetch(`${API_URL}/api/leaderboard`);
@@ -195,17 +283,30 @@
 
                 players.forEach((player, index) => {
                     let rankBadge = index + 1;
-                    let rowClass = "hover:bg-white/5";
-                    if (index === 0) { rankBadge = '🥇'; rowClass = "bg-yellow-500/5 font-bold text-yellow-400"; }
-                    else if (index === 1) { rankBadge = '🥈'; rowClass = "bg-gray-400/5 font-bold text-gray-300"; }
-                    else if (index === 2) { rankBadge = '🥉'; rowClass = "bg-amber-700/5 font-bold text-amber-500"; }
+                    let rowClass = "hover:bg-white/5 transition-colors";
+                    let badgeHTML = `<span class="gaming-font text-xs bg-zinc-900 border border-zinc-800 text-zinc-400 px-2.5 py-1 rounded font-bold">${rankBadge}</span>`;
+                    
+                    if (index === 0) { 
+                        rowClass = "bg-yellow-500/5 font-bold text-yellow-400"; 
+                        badgeHTML = `<span class="gaming-font text-xs bg-gradient-to-r from-amber-500 to-yellow-400 text-black px-2.5 py-1 rounded font-black tracking-wide shadow-[0_0_10px_rgba(234,179,8,0.2)]">🥇 MVP</span>`;
+                    }
+                    else if (index === 1) { 
+                        rowClass = "bg-zinc-400/5 font-bold text-gray-300"; 
+                        badgeHTML = `<span class="gaming-font text-xs bg-gradient-to-r from-zinc-400 to-gray-200 text-black px-2.5 py-1 rounded font-black tracking-wide">🥈 ELITE</span>`;
+                    }
+                    else if (index === 2) { 
+                        rowClass = "bg-amber-700/5 font-bold text-amber-500"; 
+                        badgeHTML = `<span class="gaming-font text-xs bg-gradient-to-r from-amber-700 to-amber-600 text-white px-2.5 py-1 rounded font-black tracking-wide">🥉 PRO</span>`;
+                    }
 
                     tbody.innerHTML += `
-                        <tr class="${rowClass} border-b border-gray-950">
-                            <td class="py-4 px-2 text-center text-base">${rankBadge}</td>
-                            <td class="py-4 px-4 font-semibold">${player.ff_name}</td>
-                            <td class="py-4 px-4 text-gray-400 hidden sm:table-cell">${player.ff_id}</td>
-                            <td class="py-4 px-4 text-right font-bold text-orange-500 gaming-font">${player.points}</td>
+                        <tr class="${rowClass} border-b border-zinc-950/40">
+                            <td class="py-4 px-2 text-center">${badgeHTML}</td>
+                            <td class="py-4 px-4 font-semibold flex items-center gap-2">
+                                <span class="text-zinc-600 text-xs">🎮</span> ${player.ff_name}
+                            </td>
+                            <td class="py-4 px-4 text-gray-400 hidden sm:table-cell tracking-wider">${player.ff_id}</td>
+                            <td class="py-4 px-4 text-right font-bold text-orange-500 gaming-font text-base neon-text">${player.points}</td>
                         </tr>
                     `;
                 });
@@ -221,7 +322,7 @@
             const whatsapp = document.getElementById('reg_whatsapp').value.trim();
             const password = document.getElementById('reg_password').value.trim();
             const ff_id = document.getElementById('reg_id').value.trim();
-            const ff_name = document.getElementById('reg_name').value.trim(); // 👈 ප්ලේයර් අතින් ගහන නම මෙතනින් ගන්නවා
+            const ff_name = document.getElementById('reg_name').value.trim();
 
             btn.disabled = true;
             btn.innerHTML = `<div class="spinner"></div> <span>Processing...</span>`;
@@ -292,7 +393,10 @@
             }
         });
 
-        window.onload = checkSession;
+        window.onload = function() {
+            checkSession();
+            startCountdown(); // ⏳ ස්ටාර්ට් කවුන්ටඩවුන්
+        };
     </script>
 </body>
 </html>
