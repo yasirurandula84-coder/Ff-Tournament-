@@ -137,10 +137,13 @@
         <div class="max-w-7xl mx-auto px-4 mt-6">
             <div class="bg-zinc-950/60 border border-zinc-900 rounded-xl p-3 flex flex-wrap items-center justify-between gap-4">
                 <div class="flex items-center gap-3">
-                    <span class="bg-red-600 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded blink-animation">LIVE</span>
-                    <p class="text-xs md:text-sm text-gray-300 font-medium tracking-wide">⚔️ WEEKLY GRAND FINALS: MATCH ROOM IS FORMING NOW!</p>
+                    <!-- 🟢 Live Status Badge එක Auto වෙනස් වෙන්න හැදුවා -->
+                    <span id="liveBadge" class="bg-red-600 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded blink-animation">LIVE</span>
+                    <!-- 💬 සර්වර් එකේ මැසේජ් එක වැටෙන තැන -->
+                    <p id="liveMatchMessage" class="text-xs md:text-sm text-gray-300 font-medium tracking-wide">Loading match details...</p>
                 </div>
-                <div class="text-xs text-gray-500 font-semibold uppercase">MAP: BERMUDA (CLASSIC)</div>
+                <!-- 🗺️ සර්වර් එකේ මැප් එක වැටෙන තැන -->
+                <div id="liveMatchMap" class="text-xs text-gray-500 font-semibold uppercase">MAP: --</div>
             </div>
         </div>
 
@@ -205,20 +208,21 @@
 
     <script>
         const API_URL = "https://ff-tournament-k4gk.onrender.com";
+        let countdownInterval = null;
 
-        // === ⏳ LIVE COUNTDOWN TIMER LOGIC ===
-        function startCountdown() {
-            // මෙතනට ඔයාගේ ඊළඟ මැච් එක තියෙන දවස දාන්න (Year, Month index [0-11], Day, Hour, Minute)
-            // දැනට මම පැය 24ක සරල ලූප් එකක් දැම්මා පේන්න
-            const targetTime = new Date();
-            targetTime.setHours(targetTime.getHours() + 18); // දැනට පැය 18ක් පෙන්වයි
+        // === ⏳ සර්වර් එකේ වෙලාවට හැදෙන LIVE COUNTDOWN TIMER LOGIC ===
+        function updateLiveCountdown(targetTimeStr) {
+            if (countdownInterval) clearInterval(countdownInterval);
 
-            function updateTimer() {
+            const countdownContainer = document.getElementById('countdown');
+            
+            function calculateTime() {
                 const now = new Date().getTime();
-                const diff = targetTime - now;
+                const diff = new Date(targetTimeStr).getTime() - now;
 
                 if (diff <= 0) {
-                    document.getElementById('countdown').innerHTML = "<div class='col-span-3 text-center text-red-500 blink-animation'>MATCH STARTED! GO TO DASHBOARD</div>";
+                    countdownContainer.innerHTML = "<div class='col-span-3 text-center text-red-500 font-bold blink-animation uppercase tracking-wider text-sm p-1'>⚔️ ROOM IS LIVE NOW! JOIN INSTANTLY!</div>";
+                    clearInterval(countdownInterval);
                     return;
                 }
 
@@ -226,12 +230,46 @@
                 const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                 const secs = Math.floor((diff % (1000 * 60)) / 1000);
 
-                document.getElementById('cd_hours').innerText = hours.toString().padStart(2, '0');
-                document.getElementById('cd_mins').innerText = mins.toString().padStart(2, '0');
-                document.getElementById('cd_secs').innerText = secs.toString().padStart(2, '0');
+                countdownContainer.innerHTML = `
+                    <div class="bg-black/50 p-2 rounded border border-zinc-900"><span>${hours.toString().padStart(2, '0')}</span><p class="text-[9px] font-normal text-gray-500 tracking-normal mt-0.5">HOURS</p></div>
+                    <div class="bg-black/50 p-2 rounded border border-zinc-900"><span>${mins.toString().padStart(2, '0')}</span><p class="text-[9px] font-normal text-gray-500 tracking-normal mt-0.5">MINS</p></div>
+                    <div class="bg-black/50 p-2 rounded border border-zinc-900"><span>${secs.toString().padStart(2, '0')}</span><p class="text-[9px] font-normal text-gray-500 tracking-normal mt-0.5">SECS</p></div>
+                `;
             }
-            setInterval(updateTimer, 1000);
-            updateTimer();
+
+            countdownInterval = setInterval(calculateTime, 1000);
+            calculateTime();
+        }
+
+        // === 📡 🛠️ FETCH AND UPDATE SETTINGS FROM SERVER ===
+        async function fetchTournamentSettings() {
+            try {
+                const response = await fetch(`${API_URL}/api/settings`);
+                const settings = await response.json();
+
+                // 1. Update Match Message and Map Info
+                document.getElementById('liveMatchMessage').innerText = settings.matchMessage;
+                document.getElementById('liveMatchMap').innerText = `MAP: ${settings.matchMap}`;
+
+                // 2. Change Badge Colors Dynamically based on live status
+                const badge = document.getElementById('liveBadge');
+                badge.innerText = settings.liveStatus;
+                if (settings.liveStatus === "LIVE") {
+                    badge.className = "bg-red-600 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded blink-animation";
+                } else if (settings.liveStatus === "UPCOMING") {
+                    badge.className = "bg-orange-500 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded";
+                } else {
+                    badge.className = "bg-zinc-700 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded";
+                }
+
+                // 3. Trigger Live Countdown Timer from Server's time
+                if (settings.nextMatchTime) {
+                    updateLiveCountdown(settings.nextMatchTime);
+                }
+
+            } catch (error) {
+                console.error("Error connecting to server settings API:", error);
+            }
         }
 
         function switchAuth(showLogin) {
@@ -395,7 +433,8 @@
 
         window.onload = function() {
             checkSession();
-            startCountdown(); // ⏳ ස්ටාර්ට් කවුන්ටඩවුන්
+            fetchTournamentSettings(); // 📡 සර්වර් එකෙන් ලයිව් සෙටින්ග්ස් ඇදලා ගන්නවා
+            setInterval(fetchTournamentSettings, 10000); // 🔄 හැම තත්පර 10කට සැරයක්ම auto-update වෙනවා සර්වර් එකෙන්
         };
     </script>
 </body>
