@@ -66,6 +66,17 @@ app.post('/api/register', registerLimiter, async (req, res) => { // 👈 registe
     try {
         const { whatsapp, password, ff_name, ff_id } = req.body;
 
+        // 1. 📞 WhatsApp Number Validation
+        if (!whatsapp || isNaN(whatsapp) || whatsapp.length < 10 || whatsapp.length > 11) {
+            return res.status(400).json({ message: "කරුණාකර වලංගු WhatsApp අංකයක් ඇතුළත් කරන්න! (947XXXXXXXX) ❌" });
+        }
+
+        // 2. 🔐 Password Validation (අඩුම අකුරු 6ක්)
+        if (!password || password.length < 6) {
+            return res.status(400).json({ message: "Password එකට අඩුම තරමින් කැරැක්ටර් 6ක්වත් තිබිය යුතුය! 🔐" });
+        }
+        
+        // ====================================================
         if (!whatsapp || !password || !ff_name || !ff_id) {
             return res.status(400).json({ message: "All fields are required! ❌" });
         }
