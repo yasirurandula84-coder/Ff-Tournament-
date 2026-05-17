@@ -692,47 +692,58 @@
         }
 
         // 2. Submit Button එක එබුවම ක්‍රියාත්මක වන Function එක
-        async function submitPlayerReceipt() {
-            const receiptUrl = document.getElementById('receiptUrlInput').value.trim();
+        // 2. Submit Button එක එබුවම ක්‍රියාත්මක වන Function එක
+async function submitPlayerReceipt() {
+    const receiptUrl = document.getElementById('receiptUrlInput').value.trim();
+    
+    const storedPlayer = localStorage.getItem('ff_player');
+    if (!storedPlayer) {
+        alert("कරුණාකර නැවත ලොග් වන්න! ❌");
+        return;
+    }
+    const playerObj = JSON.parse(storedPlayer);
+    const playerWhatsapp = playerObj.whatsapp;
+
+    // === 🛡️ [URL VALIDATION] බොරු ටෙක්ස්ට් ගැසීම වැළැක්වීම ===
+    // ලින්ක් එකක්ද කියලා චෙක් කරන Regex එකක්
+    const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/i;
+
+    if (!receiptUrl) {
+        alert("කරුණාකර රිසිට් ලින්ක් එකක් ඇතුළත් කරන්න! ❌");
+        return;
+    }
+
+    if (!urlPattern.test(receiptUrl)) {
+        alert("කරුණාකර වලංගු Image URL ලින්ක් එකක් ඇතුළත් කරන්න! (උදා: https://imgur.com/xyz) ❌");
+        return;
+    }
+    // =========================================================
+
+    try {
+        const response = await fetch(`${API_URL}/api/player/upload-receipt`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ whatsapp: playerWhatsapp, payment_slip: receiptUrl })
+        });
+        const data = await response.json();
+        
+        if (response.ok) {
+            alert("රිසිට්පත සාර්ථකව සයිට් එකට ලැබුණා! Admin පරීක්ෂා කරන තෙක් රැඳී සිටින්න. ⏳");
+            document.getElementById('receiptUrlInput').value = "";
             
-            const storedPlayer = localStorage.getItem('ff_player');
-            if (!storedPlayer) {
-                alert("කරුණාකර නැවත ලොග් වන්න! ❌");
-                return;
-            }
-            const playerObj = JSON.parse(storedPlayer);
-            const playerWhatsapp = playerObj.whatsapp;
-
-            if (!receiptUrl) {
-                alert("කරුණාකර වලංගු රිසිට් ලින්ක් එකක් ඇතුළත් කරන්න! ❌");
-                return;
-            }
-
-            try {
-                const response = await fetch(`${API_URL}/api/player/upload-receipt`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ whatsapp: playerWhatsapp, payment_slip: receiptUrl })
-                });
-                const data = await response.json();
-                
-                if (response.ok) {
-                    alert("රිසිට්පත සාර්ථකව සයිට් එකට ලැබුණා! Admin පරීක්ෂා කරන තෙක් රැඳී සිටින්න. ⏳");
-                    document.getElementById('receiptUrlInput').value = "";
-                    
-                    playerObj.payment_status = "Pending";
-                    playerObj.payment_slip = receiptUrl;
-                    localStorage.setItem('ff_player', JSON.stringify(playerObj));
-                    
-                    updatePaymentTabUI(playerObj);
-                } else {
-                    alert(data.message || "Error uploading receipt! ❌");
-                }
-            } catch (error) {
-                console.error("Upload error:", error);
-                alert("Server එකට සම්බන්ධ වීමට නොහැකි වුණා! ❌");
-            }
+            playerObj.payment_status = "Pending";
+            playerObj.payment_slip = receiptUrl;
+            localStorage.setItem('ff_player', JSON.stringify(playerObj));
+            
+            updatePaymentTabUI(playerObj);
+        } else {
+            alert(data.message || "Error uploading receipt! ❌");
         }
+    } catch (error) {
+        console.error("Upload error:", error);
+        alert("Server එකට සම්බන්ධ වීමට නොහැකි වුණා! ❌");
+    }
+}
     </script>
 </body>
 </html>
