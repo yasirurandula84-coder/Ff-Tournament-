@@ -431,6 +431,23 @@
         function closeModal() {
             document.getElementById('imageModal').classList.add('hidden');
         }
+async function deletePlayer(whatsappNumber) {
+    if(!confirm("ඔබට විශ්වාසද මේ ප්ලේයර්ව සම්පූර්ණයෙන්ම Delete කරලා දාන්න ඕනේ කියලා? ⚠️")) return;
+
+    try {
+        const response = await fetch('/api/admin/delete-player', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ adminPassword: "admin123", whatsapp: whatsappNumber })
+        });
+        const data = await response.json();
+        alert(data.message);
+        location.reload(); // ලිස්ට් එක refresh කරනවා
+    } catch (error) {
+        alert("Error deleting player!");
+    }
+}
+        
     </script>
 </body>
 </html>
