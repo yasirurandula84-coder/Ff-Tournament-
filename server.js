@@ -23,7 +23,9 @@ let tournamentSettings = {
     nextMatchTime: "2026-05-20T20:30", 
     liveStatus: "UPCOMING", 
     matchMessage: "WEEKLY GRAND FINALS: MATCH ROOM IS FORMING SOON!",
-    matchMap: "BERMUDA (CLASSIC)"
+    matchMap: "BERMUDA (CLASSIC)",
+    ezCashNumber: "", // Frontend Input සඳහා Memory variables එකතු කරා
+    bankDetails: ""
 };
 
 // MongoDB Connection
@@ -126,8 +128,7 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// === 🛡️ 2.1 [UPDATED FIXED] ⚡ AUTO-REFRESH PLAYER STATUS CHECK API ===
-// Frontend එකෙන් තත්පර 10න් 10ට කෝල් කරද්දී ප්ලේයර්ගේ නම, පොයින්ට්ස් සේරම අප්ඩේට් වෙන්න මෙතනින් හැම ඩේටා එකක්ම යවනවා.
+// === 🛡️ 2.1 ⚡ AUTO-REFRESH PLAYER STATUS CHECK API ===
 app.get('/api/players/:whatsapp', async (req, res) => {
     try {
         const { whatsapp } = req.params;
@@ -137,7 +138,6 @@ app.get('/api/players/:whatsapp', async (req, res) => {
             return res.status(404).json({ isBanned: true, message: "Account deleted by Admin" });
         }
         
-        // ✨ මෙන්න මෙතනට අපි අනෙක් හැම විස්තරයක්ම එකතු කරා (එතකොට undefined වෙන්නේ නෑ)
         res.json({
             whatsapp: player.whatsapp,
             ff_name: player.ff_name,
@@ -145,6 +145,7 @@ app.get('/api/players/:whatsapp', async (req, res) => {
             points: player.points,
             reg_fee: player.reg_fee,
             payment_status: player.payment_status,
+            payment_slip: player.payment_slip, // Slip එකත් pass කරා
             isBanned: player.isBanned
         });
     } catch (err) {
@@ -182,7 +183,7 @@ app.get('/api/settings', (req, res) => {
 
 // === 🔐 6. UPDATE SETTINGS API (ADMIN ONLY) ===
 app.post('/api/settings/update', (req, res) => {
-    const { adminPassword, nextMatchTime, liveStatus, matchMessage, matchMap } = req.body;
+    const { adminPassword, nextMatchTime, liveStatus, matchMessage, matchMap, ezCashNumber, bankDetails } = req.body;
 
     if (adminPassword !== "admin123") {
         return res.status(403).json({ success: false, message: "Wrong Admin Password! ❌" });
@@ -192,6 +193,8 @@ app.post('/api/settings/update', (req, res) => {
     if (liveStatus) tournamentSettings.liveStatus = liveStatus;
     if (matchMessage) tournamentSettings.matchMessage = matchMessage;
     if (matchMap) tournamentSettings.matchMap = matchMap;
+    if (ezCashNumber !== undefined) tournamentSettings.ezCashNumber = ezCashNumber;
+    if (bankDetails !== undefined) tournamentSettings.bankDetails = bankDetails;
 
     res.json({ success: true, message: "Tournament Settings Updated Successfully! 🔥", settings: tournamentSettings });
 });
@@ -231,25 +234,67 @@ app.post('/api/admin/toggle-ban', async (req, res) => {
     }
 });
 
-// === ✅ 💸 10. ප්ලේයර්ගේ Payment එක Approve කරන නව API එක ===
-app.post('/api/admin/approve-payment', async (req, res) => {
-    const { adminPassword, whatsapp } = req.body;
+
+// =========================================================================
+// === 📑 [NEW FIXED] RECEIPT / APPROVAL SYSTEM ENDPOINTS FOR ADMIN PANEL ===
+// =========================================================================
+
+// 1. Pending තියෙන, රිසිට් එකක් upload කරපු ප්ලේයර්ස්ලා විතරක් ගන්න API එක
+app.post('/api/admin/pending-receipts', async (req, res) => {
+    const { adminPassword } = req.body;
     if (adminPassword !== "admin123") return res.status(403).json({ message: "Invalid Admin Password!" });
 
     try {
-        const player = await Player.findOneAndUpdate(
-            { whatsapp: whatsapp },
-            { payment_status: "Approved" },
-            { new: true }
-        );
+        // payment_status එක "Pending" සහ payment_slip එක හිස් නැති අය විතරක් සොයයි
+        const pendingPlayers = await Player.find({
+            payment_status: "Pending",
+            payment_slip: { $ne: "" }
+        }, 'whatsapp ff_name ff_id payment_slip payment_status');
+        
+        // Frontend එක බලාපොරොත්තු වන විදියට 'receipt_url' කියන field එකට map කරනවා
+        const formattedPlayers = pendingPlayers.map(p => ({
+            whatsapp: p.whatsapp,
+            ff_name: p.ff_name,
+            ff_id: p.ff_id,
+            receipt_url: p.payment_slip, // Schema එකේ තියෙන slip එක මෙතනට map කරා
+            payment_status: p.payment_status
+        }));
 
-        if (!player) return res.status(404).json({ message: "Player not found!" });
-
-        res.json({ message: `${player.ff_name}ගේ ලියාපදිංචි ගාස්තුව සාර්ථකව Approve කරන ලදී! ✅` });
+        res.json(formattedPlayers);
     } catch (err) {
-        res.status(500).json({ message: "Database error!" });
+        res.status(500).json({ message: "Database error scanning receipts!" });
     }
 });
+
+// 2. රිසිට් එක Approve හෝ Reject කරන Main API එක
+app.post('/api/admin/review-receipt', async (req, res) => {
+    const { adminPassword, whatsapp, action } = req.body; // action = 'APPROVE' හෝ 'REJECT'
+    if (adminPassword !== "admin123") return res.status(403).json({ message: "Invalid Admin Password!" });
+
+    try {
+        let updateData = {};
+        let successMessage = "";
+
+        if (action === "APPROVE") {
+            updateData = { payment_status: "Approved" };
+            successMessage = "Payment Approved and Player Verified! ✅";
+        } else if (action === "REJECT") {
+            // Reject කරොත් ආයෙත් ප්ලේයර්ට රිසිට් එකක් දාන්න පුළුවන් වෙන්න status එක Pending කරලා slip එක හිස් කරනවා
+            updateData = { payment_status: "Pending", payment_slip: "" };
+            successMessage = "Receipt Rejected! Account set back to pending. ❌";
+        } else {
+            return res.status(400).json({ message: "Invalid Action!" });
+        }
+
+        const player = await Player.findOneAndUpdate({ whatsapp }, updateData, { new: true });
+        if (!player) return res.status(404).json({ message: "Player not found!" });
+
+        res.json({ message: `Player ${player.ff_name}: ${successMessage}` });
+    } catch (err) {
+        res.status(500).json({ message: "Database verification error!" });
+    }
+});
+
 
 // === 🚀 SERVER LISTEN ===
 const PORT = process.env.PORT || 5000;
