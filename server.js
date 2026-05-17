@@ -234,6 +234,28 @@ app.post('/api/admin/toggle-ban', async (req, res) => {
     }
 });
 
+// === 🗑️ 10. ප්ලේයර් කෙනෙක්ව DATABASE එකෙන්ම DELETE කරන API එක ===
+app.post('/api/admin/delete-player', async (req, res) => {
+    const { adminPassword, whatsapp } = req.body;
+    
+    // Security check
+    if (adminPassword !== "admin123") {
+        return res.status(403).json({ message: "Invalid Admin Password! ❌" });
+    }
+
+    try {
+        // ඩේටාබේස් එකෙන් WhatsApp අංකය සොයා සම්පූර්ණයෙන්ම මකා දමයි
+        const player = await Player.findOneAndDelete({ whatsapp: whatsapp });
+        
+        if (!player) {
+            return res.status(404).json({ message: "Player සොයා ගැනීමට නොහැකි වුණා! ❌" });
+        }
+        
+        res.json({ message: `Player ${player.ff_name} can be deleted successfully! 🗑️` });
+    } catch (err) {
+        res.status(500).json({ message: "Database delete error!" });
+    }
+});
 
 // =========================================================================
 // === 📑 [NEW FIXED] RECEIPT / APPROVAL SYSTEM ENDPOINTS FOR ADMIN PANEL ===
