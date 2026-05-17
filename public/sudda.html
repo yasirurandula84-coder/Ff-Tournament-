@@ -5,93 +5,93 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FF HUB - ADMIN PANEL</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Rajdhani', sans-serif;
-            background: radial-gradient(circle at center, #111 0%, #050505 100%);
+            background: radial-gradient(circle at center, #18181b 0%, #09090b 100%);
         }
         .gaming-font { font-family: 'Orbitron', sans-serif; }
-        .neon-border { box-shadow: 0 0 20px rgba(249, 115, 22, 0.2); border: 1px solid rgba(249, 115, 22, 0.4); }
-        .active-tab { background: linear-gradient(to right, #ea580c, #dc2626); color: white; border-color: transparent; }
+        .neon-border { box-shadow: 0 0 25px rgba(249, 115, 22, 0.15); border: 1px solid rgba(249, 115, 22, 0.3); }
+        .active-tab { background: linear-gradient(135deg, #f97316, #dc2626); color: white; border-color: transparent; box-shadow: 0 4px 15px rgba(234, 88, 12, 0.3); }
         .custom-scroll::-webkit-scrollbar { width: 6px; }
-        .custom-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
-        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #ea580c; }
+        .custom-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #f97316; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen justify-center items-center px-4 py-8 text-gray-100">
 
-    <div class="w-full max-w-2xl bg-black/80 p-6 rounded-2xl neon-border backdrop-blur-md transition-all duration-300">
+    <div class="w-full max-w-3xl bg-zinc-950/90 p-6 rounded-2xl neon-border backdrop-blur-lg transition-all duration-300 shadow-2xl">
         
         <!-- HEADER -->
         <div class="text-center mb-6">
-            <h1 class="gaming-font text-2xl font-black text-orange-500 uppercase tracking-wider">
+            <h1 class="gaming-font text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500 uppercase tracking-wider drop-shadow-md">
                 ⚙️ HUB CONTROLLER
             </h1>
-            <p class="text-xs text-gray-500 uppercase tracking-widest mt-1">Official Tournament Administration</p>
+            <p class="text-xs text-zinc-500 uppercase tracking-widest mt-1.5 font-semibold">Official Tournament Administration</p>
         </div>
 
         <!-- SECRET PASSWORD -->
-        <div class="mb-6 bg-zinc-900/40 p-3 rounded-xl border border-zinc-800/60">
-            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Secret Admin Password</label>
-            <input type="password" id="admin_pass" placeholder="Enter secret key..." required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500">
+        <div class="mb-6 bg-zinc-900/50 p-4 rounded-xl border border-zinc-800/80 shadow-inner">
+            <label class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1.5">Secret Admin Password</label>
+            <input type="password" id="admin_pass" placeholder="Enter secret key to unlock access..." required class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all">
         </div>
 
         <!-- NAVIGATION TABS -->
-        <div class="grid grid-cols-2 gap-2 mb-6 border-b border-zinc-800 pb-4">
-            <button onclick="switchTab('dashboard-tab')" id="btn-dashboard-tab" class="active-tab gaming-font py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all border border-zinc-800 text-gray-400 hover:text-white">
+        <div class="grid grid-cols-3 gap-2 mb-6 border-b border-zinc-800/80 pb-4">
+            <button onclick="switchTab('dashboard-tab')" id="btn-dashboard-tab" class="active-tab gaming-font py-2.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all border border-zinc-800 text-zinc-400 hover:text-white">
                 📢 Updates Panel
             </button>
-            <button onclick="switchTab('player-tab')" id="btn-player-tab" class="gaming-font py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all border border-zinc-800 text-gray-400 hover:text-white">
+            <button onclick="switchTab('player-tab')" id="btn-player-tab" class="gaming-font py-2.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all border border-zinc-800 text-zinc-400 hover:text-white">
                 🚫 Edit System
+            </button>
+            <button onclick="switchTab('receipt-tab'); loadPendingReceipts();" id="btn-receipt-tab" class="gaming-font py-2.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all border border-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center gap-1">
+                📑 Receipts <span id="receipt-badge" class="hidden bg-red-500 text-white text-[10px] px-1.5 py-0.2 rounded-full font-sans">0</span>
             </button>
         </div>
 
         <!-- ================= TAB 1: DASHBOARD UPDATES ================= -->
-        <div id="dashboard-tab" class="tab-content space-y-4">
-            <form id="adminForm" class="space-y-4">
-                
+        <div id="dashboard-tab" class="tab-content space-y-5">
+            <form id="adminForm" class="space-y-5">
                 <!-- MATCH DETAILS SECTION -->
-                <div class="space-y-4 p-4 bg-zinc-900/20 rounded-xl border border-zinc-800/40">
-                    <h3 class="text-xs font-bold text-orange-500 uppercase tracking-wider mb-2">🏆 Match Settings</h3>
+                <div class="space-y-4 p-4 bg-zinc-900/30 rounded-xl border border-zinc-800/60">
+                    <h3 class="text-xs font-bold text-orange-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">🏆 Match Settings</h3>
                     <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Next Match Date & Time</label>
-                        <input type="datetime-local" id="admin_time" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500">
+                        <label class="block text-xs font-bold text-zinc-400 uppercase mb-1.5">Next Match Date & Time</label>
+                        <input type="datetime-local" id="admin_time" required class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Live Match Status</label>
-                        <select id="admin_status" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500">
+                        <label class="block text-xs font-bold text-zinc-400 uppercase mb-1.5">Live Match Status</label>
+                        <select id="admin_status" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all">
                             <option value="LIVE">LIVE NOW 🔴</option>
                             <option value="UPCOMING">UPCOMING ⏳</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Ticker Alert Message</label>
-                        <input type="text" id="admin_msg" placeholder="e.g. GRAND FINALS IS STARTING SOON!" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500">
+                        <label class="block text-xs font-bold text-zinc-400 uppercase mb-1.5">Ticker Alert Message</label>
+                        <input type="text" id="admin_msg" placeholder="e.g. GRAND FINALS IS STARTING SOON!" required class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Match Map</label>
-                        <input type="text" id="admin_map" placeholder="e.g. BERMUDA (CLASSIC)" required class="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500">
+                        <label class="block text-xs font-bold text-zinc-400 uppercase mb-1.5">Match Map</label>
+                        <input type="text" id="admin_map" placeholder="e.g. BERMUDA (CLASSIC)" required class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all">
                     </div>
                 </div>
 
-                <!-- PAYMENT DETAILS SECTION (NEW) -->
-                <div class="space-y-4 p-4 bg-zinc-900/20 rounded-xl border border-zinc-800/40">
-                    <h3 class="text-xs font-bold text-yellow-500 uppercase tracking-wider mb-2">💳 Gateway Settings (Payment)</h3>
-                    
+                <!-- PAYMENT DETAILS SECTION -->
+                <div class="space-y-4 p-4 bg-zinc-900/30 rounded-xl border border-zinc-800/60">
+                    <h3 class="text-xs font-bold text-yellow-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">💳 Gateway Settings (Payment)</h3>
                     <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">eZ Cash Number</label>
-                        <input type="text" id="admin_ezcash" placeholder="e.g. 077XXXXXXX (පස්සේ fill කරගන්න)" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500">
+                        <label class="block text-xs font-bold text-zinc-400 uppercase mb-1.5">eZ Cash Number</label>
+                        <input type="text" id="admin_ezcash" placeholder="e.g. 077XXXXXXX" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all">
                     </div>
-
                     <div class="border-t border-zinc-800/60 pt-3 mt-2">
-                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Bank Payment Details</label>
-                        <textarea id="admin_bank" rows="3" placeholder="Bank: XXXXX&#10;Account Name: XXXXX&#10;Account Number: XXXXX&#10;Branch: XXXXX" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500 custom-scroll"></textarea>
+                        <label class="block text-xs font-bold text-zinc-400 uppercase mb-1.5">Bank Payment Details</label>
+                        <textarea id="admin_bank" rows="4" placeholder="Bank: XXXXX&#10;Account Name: XXXXX&#10;Account Number: XXXXX&#10;Branch: XXXXX" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 custom-scroll transition-all"></textarea>
                     </div>
                 </div>
                 
-                <button type="submit" id="adminBtn" class="w-full gaming-font bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 text-white font-black py-3 rounded-lg text-sm uppercase tracking-wider transition-all shadow-lg shadow-orange-900/20">
+                <button type="submit" id="adminBtn" class="w-full gaming-font bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500 text-white font-black py-3.5 rounded-lg text-sm uppercase tracking-wider transition-all shadow-lg shadow-orange-950/40 active:scale-[0.99]">
                     Update Live Dashboard
                 </button>
             </form>
@@ -101,35 +101,58 @@
         <!-- ================= TAB 2: EDIT SYSTEM (PLAYER LIST CONTROLLER) ================= -->
         <div id="player-tab" class="tab-content space-y-4 hidden">
             <div class="flex justify-between items-center mb-2">
-                <h3 class="gaming-font text-sm font-bold text-zinc-400 uppercase tracking-wide">Registered Player Base</h3>
-                <button onclick="loadPlayerList()" class="bg-zinc-800 hover:bg-zinc-700 text-orange-500 font-bold px-3 py-1.5 rounded-lg text-xs uppercase tracking-wider transition-all border border-zinc-700">
+                <h3 class="gaming-font text-xs font-bold text-zinc-400 uppercase tracking-wider">Registered Player Base</h3>
+                <button onclick="loadPlayerList()" class="bg-zinc-900 hover:bg-zinc-800 text-orange-500 hover:text-orange-400 font-bold px-3 py-1.5 rounded-lg text-xs uppercase tracking-wider transition-all border border-zinc-800 shadow-md">
                     🔄 Load Players List
                 </button>
             </div>
 
-            <!-- PLAYER LIST CONTAINER -->
-            <div class="border border-zinc-800 rounded-xl overflow-hidden bg-zinc-950/40">
+            <div class="border border-zinc-800/80 rounded-xl overflow-hidden bg-zinc-950/60 shadow-inner">
                 <div class="max-h-96 overflow-y-auto custom-scroll">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="bg-zinc-900/80 border-b border-zinc-800 text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
-                                <th class="p-3">Player Credentials</th>
-                                <th class="p-3 text-center">Coins (Edit)</th>
-                                <th class="p-3 text-center">Actions</th>
+                            <tr class="bg-zinc-900/90 border-b border-zinc-800 text-[11px] font-bold text-zinc-400 uppercase tracking-wider sticky top-0 backdrop-blur-md">
+                                <th class="p-3.5">Player Credentials</th>
+                                <th class="p-3.5 text-center">Coins (Edit)</th>
+                                <th class="p-3.5 text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="playerListBody">
                             <tr>
-                                <td colspan="3" class="text-center p-8 text-sm text-zinc-500 uppercase tracking-wider">Click "Load Players List" to fetch data</td>
+                                <td colspan="3" class="text-center p-8 text-xs text-zinc-500 uppercase tracking-widest font-medium">Click "Load Players List" to fetch data</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-            
             <p id="controlMessage" class="mt-4 text-center text-xs font-semibold block p-3 rounded-lg hidden"></p>
         </div>
 
+        <!-- ================= TAB 3: RECEIPT APPROVAL SYSTEM ================= -->
+        <div id="receipt-tab" class="tab-content space-y-4 hidden">
+            <div class="flex justify-between items-center mb-2">
+                <h3 class="gaming-font text-xs font-bold text-zinc-400 uppercase tracking-wider">Pending Payment Approvals</h3>
+                <button onclick="loadPendingReceipts()" class="bg-zinc-900 hover:bg-zinc-800 text-yellow-500 hover:text-yellow-400 font-bold px-3 py-1.5 rounded-lg text-xs uppercase tracking-wider transition-all border border-zinc-800 shadow-md">
+                    🔄 Refresh Receipts
+                </button>
+            </div>
+
+            <!-- RECEIPTS GRID/LIST -->
+            <div class="border border-zinc-800/80 rounded-xl overflow-hidden bg-zinc-950/60 shadow-inner p-4 max-h-[500px] overflow-y-auto custom-scroll">
+                <div id="receiptsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Receipts cards will load here dynamically -->
+                    <p class="text-center col-span-2 py-8 text-xs text-zinc-500 uppercase tracking-widest font-medium">Input Admin password and click refresh</p>
+                </div>
+            </div>
+            <p id="receiptMessage" class="mt-4 text-center text-xs font-semibold block p-3 rounded-lg hidden"></p>
+        </div>
+
+    </div>
+
+    <!-- IMAGE MODAL FOR FULL SCREEN VIEW -->
+    <div id="imageModal" class="fixed inset-0 bg-black/90 hidden z-50 flex justify-center items-center p-4">
+        <button onclick="closeModal()" class="absolute top-4 right-4 bg-zinc-900 text-white rounded-full p-3 border border-zinc-800 hover:bg-zinc-800 transition-all font-bold text-sm">✕ Close</button>
+        <img id="modalImg" src="" class="max-w-full max-h-[85vh] rounded-lg shadow-2xl border border-zinc-800">
     </div>
 
     <!-- MAIN JAVASCRIPT LOGIC -->
@@ -141,8 +164,9 @@
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById(tabId).classList.remove('hidden');
 
-            document.getElementById('btn-dashboard-tab').className = "gaming-font py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all border border-zinc-800 text-gray-400 hover:text-white";
-            document.getElementById('btn-player-tab').className = "gaming-font py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all border border-zinc-800 text-gray-400 hover:text-white";
+            document.getElementById('btn-dashboard-tab').className = "gaming-font py-2.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all border border-zinc-800 text-zinc-400 hover:text-white";
+            document.getElementById('btn-player-tab').className = "gaming-font py-2.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all border border-zinc-800 text-zinc-400 hover:text-white";
+            document.getElementById('btn-receipt-tab').className = "gaming-font py-2.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all border border-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center gap-1";
 
             document.getElementById(`btn-${tabId}`).classList.add('active-tab');
         }
@@ -158,8 +182,6 @@
                 document.getElementById('admin_status').value = settings.liveStatus || "UPCOMING";
                 document.getElementById('admin_msg').value = settings.matchMessage || "";
                 document.getElementById('admin_map').value = settings.matchMap || "";
-                
-                // Fetch existing payment data if available
                 document.getElementById('admin_ezcash').value = settings.ezCashNumber || "";
                 document.getElementById('admin_bank').value = settings.bankDetails || "";
             } catch (error) { console.error("Error loading settings:", error); }
@@ -186,7 +208,6 @@
                         liveStatus: document.getElementById('admin_status').value,
                         matchMessage: document.getElementById('admin_msg').value.trim(),
                         matchMap: document.getElementById('admin_map').value.trim(),
-                        // Transmitting payment data to backend
                         ezCashNumber: document.getElementById('admin_ezcash').value.trim(),
                         bankDetails: document.getElementById('admin_bank').value.trim()
                     })
@@ -200,17 +221,13 @@
             } finally { btn.disabled = false; btn.innerText = "Update Live Dashboard"; }
         });
 
-        // 🔄 FETCH AND RENDER PLAYER LIST WITH SCHEMA FIELDS
+        // 🔄 FETCH AND RENDER PLAYER LIST
         async function loadPlayerList() {
             const adminPassword = document.getElementById('admin_pass').value.trim();
             const tbody = document.getElementById('playerListBody');
             
-            if(!adminPassword) {
-                alert("Please input Secret Admin Password first!");
-                return;
-            }
-
-            tbody.innerHTML = `<tr><td colspan="3" class="text-center p-8 text-xs text-orange-500 uppercase tracking-widest animate-pulse">Fetching Database rows...</td></tr>`;
+            if(!adminPassword) { alert("Please input Secret Admin Password first!"); return; }
+            tbody.innerHTML = `<tr><td colspan="3" class="text-center p-8 text-xs text-orange-500 uppercase tracking-widest animate-pulse font-bold">Fetching Database rows...</td></tr>`;
 
             try {
                 const response = await fetch(`${API_URL}/api/admin/players`, {
@@ -221,68 +238,58 @@
                 
                 if(!response.ok) {
                     const errData = await response.json();
-                    tbody.innerHTML = `<tr><td colspan="3" class="text-center p-8 text-sm text-red-500">${errData.message || 'Failed to load'}</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="3" class="text-center p-8 text-sm text-red-500 font-semibold">${errData.message || 'Failed to load'}</td></tr>`;
                     return;
                 }
 
                 const players = await response.json();
                 if(players.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="3" class="text-center p-8 text-sm text-zinc-500">No players found in Database.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="3" class="text-center p-8 text-sm text-zinc-500 uppercase tracking-wider">No players found.</td></tr>`;
                     return;
                 }
 
-                tbody.innerHTML = ""; // Clear table
+                tbody.innerHTML = ""; 
                 players.forEach(p => {
                     const row = document.createElement('tr');
-                    row.className = "border-b border-zinc-900 hover:bg-zinc-900/30 text-sm transition-all";
-                    
-                    const banBadge = p.isBanned ? `<span class="text-[9px] bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded border border-red-500/30 font-bold ml-1 tracking-wider">BANNED</span>` : "";
-                    
-                    const regDate = p.registered_at ? new Date(p.registered_at).toLocaleString('en-US', { hour12: true, dateStyle: 'medium', timeStyle: 'short' }) : "N/A";
-                    const fee = p.reg_fee !== undefined ? p.reg_fee : 200;
+                    row.className = "border-b border-zinc-900/60 hover:bg-zinc-900/40 text-sm transition-all";
+                    const banBadge = p.isBanned ? `<span class="text-[9px] bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded border border-red-500/30 font-bold ml-1.5 tracking-wider">BANNED</span>` : "";
+                    const statusBadge = p.paymentStatus === 'APPROVED' ? `<span class="text-[9px] bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded border border-green-500/30 font-bold ml-1.5">VERIFIED</span>` : `<span class="text-[9px] bg-yellow-500/20 text-yellow-400 px-1.5 py-0.5 rounded border border-yellow-500/30 font-bold ml-1.5">PENDING</span>`;
+                    const regDate = p.registered_at ? new Date(p.registered_at).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) : "N/A";
 
                     row.innerHTML = `
                         <td class="p-3">
-                            <div class="flex items-center gap-1.5">
-                                <span class="text-white font-bold tracking-wide text-sm">${p.ff_name}</span> 
-                                ${banBadge}
+                            <div class="flex items-center gap-1">
+                                <span class="text-white font-bold tracking-wide">${p.ff_name}</span> ${statusBadge} ${banBadge}
                             </div>
-                            <div class="text-[11px] text-zinc-500 font-medium space-y-0.5 mt-1">
+                            <div class="text-[11px] text-zinc-500 font-medium space-y-0.5 mt-1.5">
                                 <div>🆔 ID: <span class="text-orange-400 font-mono">${p.ff_id}</span></div>
                                 <div>📞 WA: <span class="text-zinc-400">${p.whatsapp}</span></div>
-                                <div>💵 Fee: <span class="text-green-500 font-semibold">Rs. ${fee}</span></div>
                                 <div class="text-[10px] text-zinc-600">📅 Reg: ${regDate}</div>
                             </div>
                         </td>
                         <td class="p-3 text-center align-middle">
-                            <button onclick="promptPointsUpdate('${p.whatsapp}', '${p.ff_name}', ${p.points})" class="gaming-font font-bold text-yellow-500 hover:text-yellow-400 bg-yellow-500/5 hover:bg-yellow-500/10 border border-yellow-500/10 px-3 py-1.5 rounded-lg transition-all cursor-pointer text-xs">
+                            <button onclick="promptPointsUpdate('${p.whatsapp}', '${p.ff_name}', ${p.points})" class="gaming-font font-bold text-yellow-500 hover:text-yellow-400 bg-yellow-500/5 hover:bg-yellow-500/10 border border-yellow-500/20 px-3 py-1.5 rounded-lg text-xs shadow-sm cursor-pointer">
                                 🪙 ${p.points}
                             </button>
                         </td>
                         <td class="p-3 text-center align-middle">
                             <div class="flex justify-center gap-1.5">
-                                <button onclick="actionToggleBan('${p.whatsapp}', true)" class="bg-red-950/40 hover:bg-red-600 text-red-500 hover:text-white font-bold px-2.5 py-1.5 rounded-md text-xs uppercase tracking-wide border border-red-900/40 transition-all">Ban</button>
-                                <button onclick="actionToggleBan('${p.whatsapp}', false)" class="bg-green-950/40 hover:bg-green-600 text-green-500 hover:text-white font-bold px-2.5 py-1.5 rounded-md text-xs uppercase tracking-wide border border-green-900/40 transition-all">Unban</button>
+                                <button onclick="actionToggleBan('${p.whatsapp}', true)" class="bg-red-950/30 hover:bg-red-600 text-red-400 hover:text-white font-bold px-2.5 py-1.5 rounded-lg text-xs border border-red-900/40 transition-all">Ban</button>
+                                <button onclick="actionToggleBan('${p.whatsapp}', false)" class="bg-green-950/30 hover:bg-green-600 text-green-400 hover:text-white font-bold px-2.5 py-1.5 rounded-lg text-xs border border-green-900/40 transition-all">Unban</button>
                             </div>
                         </td>
                     `;
                     tbody.appendChild(row);
                 });
-
-            } catch (error) {
-                tbody.innerHTML = `<tr><td colspan="3" class="text-center p-8 text-sm text-red-500">Error loading data stream.</td></tr>`;
-            }
+            } catch (error) { tbody.innerHTML = `<tr><td colspan="3" class="text-center p-8 text-sm text-red-500 font-semibold">Error loading database.</td></tr>`; }
         }
 
         // 🪙 EDIT COINS
         async function promptPointsUpdate(whatsapp, name, currentPoints) {
             const adminPassword = document.getElementById('admin_pass').value.trim();
             const newPoints = prompt(`Edit Points for ${name}:`, currentPoints);
-            
             if (newPoints === null || newPoints === "") return;
             if (isNaN(newPoints)) { alert("Please enter a valid number!"); return; }
-
-            showControlMsg("Updating player table entry...", "text-yellow-400 bg-yellow-500/10");
 
             try {
                 const response = await fetch(`${API_URL}/api/admin/update-points`, {
@@ -291,23 +298,14 @@
                     body: JSON.stringify({ adminPassword, whatsapp, newPoints })
                 });
                 const data = await response.json();
-                
-                if(response.ok) {
-                    showControlMsg(data.message, "text-green-400 bg-green-500/10 border border-green-500/20");
-                    loadPlayerList();
-                } else {
-                    showControlMsg(data.message, "text-red-400 bg-red-500/10 border border-red-500/20");
-                }
-            } catch (error) { showControlMsg("Server communication breakdown.", "text-red-400 bg-red-500/10"); }
+                if(response.ok) { loadPlayerList(); } else { alert(data.message); }
+            } catch (error) { alert("Server Error"); }
         }
 
         // 🚫 BAN / UNBAN
         async function actionToggleBan(whatsapp, isBanned) {
             const adminPassword = document.getElementById('admin_pass').value.trim();
-            const confirmAction = confirm(`Execute accounts policy: ${isBanned ? 'BAN' : 'UNBAN'} player ${whatsapp}?`);
-            if(!confirmAction) return;
-
-            showControlMsg("Processing restriction logic...", "text-yellow-400 bg-yellow-500/10");
+            if(!confirm(`Are you sure you want to ${isBanned ? 'BAN' : 'UNBAN'} this player?`)) return;
 
             try {
                 const response = await fetch(`${API_URL}/api/admin/toggle-ban`, {
@@ -315,22 +313,123 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ adminPassword, whatsapp, isBanned })
                 });
-                const data = await response.json();
-                
-                if(response.ok) {
-                    showControlMsg(data.message, "text-orange-400 bg-orange-500/10 border border-orange-500/20");
-                    loadPlayerList();
-                } else {
-                    showControlMsg(data.message, "text-red-400 bg-red-500/10 border border-red-500/20");
-                }
-            } catch (error) { showControlMsg("Server communication breakdown.", "text-red-400 bg-red-500/10"); }
+                if(response.ok) { loadPlayerList(); }
+            } catch (error) { alert("Server Error"); }
         }
 
-        function showControlMsg(text, classes) {
-            const msgEl = document.getElementById('controlMessage');
-            msgEl.className = `mt-4 text-center text-xs font-semibold block p-3 rounded-lg ${classes}`;
-            msgEl.innerText = text;
-            msgEl.classList.remove('hidden');
+
+        // ================= 📑 RECEIPT SYSTEM LOGIC =================
+
+        // 🔄 FETCH PENDING RECEIPTS
+        async function loadPendingReceipts() {
+            const adminPassword = document.getElementById('admin_pass').value.trim();
+            const container = document.getElementById('receiptsContainer');
+            const badge = document.getElementById('receipt-badge');
+
+            if(!adminPassword) { alert("Please input Secret Admin Password first!"); return; }
+            container.innerHTML = `<p class="text-center col-span-2 py-8 text-xs text-yellow-500 uppercase tracking-widest font-bold animate-pulse">Scanning Receipts Database...</p>`;
+
+            try {
+                const response = await fetch(`${API_URL}/api/admin/pending-receipts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ adminPassword })
+                });
+
+                if(!response.ok) {
+                    const err = await response.json();
+                    container.innerHTML = `<p class="text-center col-span-2 text-sm text-red-500 font-semibold">${err.message || 'Failed'}</p>`;
+                    return;
+                }
+
+                const pendingPlayers = await response.json();
+                
+                // Update badge counter
+                if(pendingPlayers.length > 0) {
+                    badge.innerText = pendingPlayers.length;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                    container.innerHTML = `<p class="text-center col-span-2 py-8 text-xs text-zinc-500 uppercase tracking-wider font-semibold">🎉 Clean sheet! No pending receipts found.</p>`;
+                    return;
+                }
+
+                container.innerHTML = ""; // Clear loader
+                pendingPlayers.forEach(p => {
+                    const card = document.createElement('div');
+                    card.className = "bg-zinc-900/60 border border-zinc-800/80 rounded-xl p-4 flex flex-col justify-between gap-3 hover:border-zinc-700/80 transition-all";
+                    
+                    // Receipt path fallback (Change according to how you save it, e.g., /uploads/receipts/filename.jpg)
+                    const receiptSrc = p.receipt_url ? `${API_URL}${p.receipt_url}` : 'https://placehold.co/300x400/18181b/f97316?text=No+Image';
+
+                    card.innerHTML = `
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="text-white font-bold text-base tracking-wide">${p.ff_name}</h4>
+                                    <p class="text-xs text-orange-400 font-mono">ID: ${p.ff_id}</p>
+                                </div>
+                                <span class="text-[10px] bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 px-2 py-0.5 rounded font-bold uppercase tracking-wider">Pending</span>
+                            </div>
+                            <div class="text-[11px] text-zinc-400">📞 WhatsApp: <span class="text-zinc-200 font-medium">${p.whatsapp}</span></div>
+                            
+                            <!-- Image Preview Card -->
+                            <div class="relative group rounded-lg overflow-hidden border border-zinc-800 bg-black h-40 cursor-zoom-in" onclick="openModal('${receiptSrc}')">
+                                <img src="${receiptSrc}" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-300">
+                                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all">
+                                    <span class="text-xs text-white font-bold bg-zinc-900/80 px-3 py-1.5 rounded-lg border border-zinc-700">🔎 Click to Expand</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Controls -->
+                        <div class="grid grid-cols-2 gap-2 pt-2 border-t border-zinc-800/60">
+                            <button onclick="reviewReceipt('${p.whatsapp}', 'REJECT')" class="bg-red-500/10 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/20 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all">
+                                ❌ Reject
+                            </button>
+                            <button onclick="reviewReceipt('${p.whatsapp}', 'APPROVE')" class="bg-green-500/10 hover:bg-green-600 text-green-400 hover:text-white border border-green-500/20 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all shadow-md">
+                                ✅ Approve
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+
+            } catch (error) { container.innerHTML = `<p class="text-center col-span-2 text-sm text-red-500 font-semibold">Failed to fetch data streams.</p>`; }
+        }
+
+        // 👌 APPROVE / REJECT CONTROLLER SUBMIT
+        async function reviewReceipt(whatsapp, action) {
+            const adminPassword = document.getElementById('admin_pass').value.trim();
+            const msgEl = document.getElementById('receiptMessage');
+            
+            if(!confirm(`Are you sure you want to ${action} this submission?`)) return;
+
+            try {
+                const response = await fetch(`${API_URL}/api/admin/review-receipt`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ adminPassword, whatsapp, action }) // action = 'APPROVE' or 'REJECT'
+                });
+                
+                const data = await response.json();
+                msgEl.className = `mt-4 text-center text-xs font-semibold block p-3 rounded-lg ${response.ok ? 'text-green-400 bg-green-500/10 border border-green-500/20' : 'text-red-400 bg-red-500/10 border border-red-500/20'}`;
+                msgEl.innerText = data.message;
+                msgEl.classList.remove('hidden');
+
+                if(response.ok) {
+                    loadPendingReceipts(); // Refresh tab
+                }
+            } catch(e) { alert("Error review connection"); }
+        }
+
+        // 🔎 MODAL UTILITIES
+        function openModal(src) {
+            document.getElementById('modalImg').src = src;
+            document.getElementById('imageModal').classList.remove('hidden');
+        }
+        function closeModal() {
+            document.getElementById('imageModal').classList.add('hidden');
         }
     </script>
 </body>
