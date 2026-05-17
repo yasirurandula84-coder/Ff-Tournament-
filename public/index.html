@@ -29,6 +29,32 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* 🛸 කාඩ්ස් පාවෙලා එන ඇනිමේෂන් එක */
+@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* 🧠 මේ ක්ලාස් එක දාන හැම කාඩ් එකක්ම මුලින් හැංගිලා ඇනිමේෂන් එක රන් වෙනවා */
+    .animate-card-fade {
+        opacity: 0;
+        animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* 🔥 [MAGIC CODE] එකම පේලියේ හෝ එක ළඟ තියෙන කාඩ්ස් වලට ඔටෝ Delay එක දෙන හැටි: */
+    .animate-card-fade:nth-child(1) { animation-delay: 0.05s; }
+    .animate-card-fade:nth-child(2) { animation-delay: 0.1s; }
+    .animate-card-fade:nth-child(3) { animation-delay: 0.15s; }
+    .animate-card-fade:nth-child(4) { animation-delay: 0.2s; }
+    .animate-card-fade:nth-child(5) { animation-delay: 0.25s; }
+    .animate-card-fade:nth-child(6) { animation-delay: 0.3s; }
+
         .blink-animation { animation: blink 1.5s infinite; }
         @keyframes blink {
             0%, 100% { opacity: 1; }
@@ -174,7 +200,7 @@
         <div class="flex-grow flex flex-col p-4 md:p-8 overflow-y-auto w-full">
             
             <!-- LIVE MATCH TICKER PANEL (ALWAYS TOP) -->
-            <div class="w-full bg-zinc-950/60 border border-zinc-900 rounded-xl p-3 flex flex-wrap items-center justify-between gap-4 mb-6">
+            <div class="w-full bg-zinc-950/60 border border-zinc-900 rounded-xl p-3 flex flex-wrap items-center justify-between gap-4 mb-6 animate-card-fade">
                 <div class="flex items-center gap-3">
                     <span id="liveBadge" class="bg-red-600 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded blink-animation">LIVE</span>
                     <p id="liveMatchMessage" class="text-xs md:text-sm text-gray-300 font-medium tracking-wide">Loading match details...</p>
@@ -187,13 +213,13 @@
             <!-- 🏠 PAGE 0: HOME DASHBOARD TAB -->
 <div id="tab-home" class="tab-page hidden space-y-6">
     <!-- Welcome Card -->
-    <div class="max-w-3xl bg-gradient-to-r from-orange-600 to-red-600 p-5 rounded-2xl border border-zinc-800 shadow-lg">
+    <div class="max-w-3xl bg-gradient-to-r from-orange-600 to-red-600 p-5 rounded-2xl border border-zinc-800 shadow-lg animate-card-fade">
         <h2 class="gaming-font text-xl font-black text-white uppercase">👋 Welcome to Tournament Hub</h2>
         <p class="text-xs text-white/90 mt-1">ඔබේ ගිණුම සාර්ථකව සම්බන්ධ වී ඇත. තරඟාවලියේ සියලුම විස්තර පහතින් බලන්න.</p>
     </div>
 
     <!-- Tournament & Rules Card -->
-    <div class="max-w-3xl gaming-card p-6 rounded-2xl border border-zinc-800/80 shadow-lg backdrop-blur-md">
+    <div class="max-w-3xl gaming-card p-6 rounded-2xl border border-zinc-800/80 shadow-lg backdrop-blur-md animate-card-fade">
         <h3 class="gaming-font text-base font-bold text-orange-500 mb-3 uppercase flex items-center gap-2 border-b border-zinc-900 pb-2">
             <span>🏆</span> Tournament details & Rules
         </h3>
@@ -206,7 +232,7 @@
     </div>
 
     <!-- Contact Card -->
-    <div class="max-w-3xl gaming-card p-6 rounded-2xl border border-zinc-800/80 shadow-lg backdrop-blur-md">
+    <div class="max-w-3xl gaming-card p-6 rounded-2xl border border-zinc-800/80 shadow-lg backdrop-blur-md animate-card-fade">
         <h3 class="gaming-font text-base font-bold text-orange-500 mb-3 uppercase flex items-center gap-2 border-b border-zinc-900 pb-2">
             <span>📞</span> Contact & Support
         </h3>
@@ -219,7 +245,7 @@
             
             <!-- 📄 PAGE 1: PLAYER PROFILE TAB -->
             <div id="tab-profile" class="tab-page">
-                <div class="max-w-3xl gaming-card p-6 rounded-2xl border border-zinc-800/80 shadow-lg backdrop-blur-md">
+                <div class="max-w-3xl gaming-card p-6 rounded-2xl border border-zinc-800/80 shadow-lg backdrop-blur-md animate-card-fade">
                     <h2 class="gaming-font text-lg font-bold text-orange-500 mb-4 border-b border-zinc-800 pb-2 uppercase flex items-center gap-2">
                         <span>🎮 PLAYER STATUS PROFILE</span>
                     </h2>
@@ -241,7 +267,7 @@
                             <b id="dashFee" class="text-white">--</b>
                         </div>
                     </div>
-                    <div class="mt-8 pt-4 border-t border-zinc-900 max-w-sm mx-auto text-center">
+                    <div class="mt-8 pt-4 border-t border-zinc-900 max-w-sm mx-auto text-center animate-card-fade">
                         <p class="text-xs text-gray-400 mb-2">👇 Connect to Official Match Communication Hub</p>
                         <a href="https://chat.whatsapp.com/ඔයාගේ_ගෲප්_ලින්ක්_එක" target="_blank" class="block gaming-font bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg text-sm uppercase tracking-wider transition-all shadow-md">💬 Join WhatsApp Group</a>
                     </div>
@@ -250,7 +276,7 @@
 
             <!-- 🏆 PAGE 2: LEADERBOARD STANDINGS TAB -->
             <div id="tab-leaderboard" class="tab-page hidden">
-                <div class="w-full bg-black/60 p-6 rounded-2xl neon-border backdrop-blur-md min-h-[450px]">
+                <div class="w-full bg-black/60 p-6 rounded-2xl neon-border backdrop-blur-md min-h-[450px] animate-card-fade">
                     <div class="flex justify-between items-center mb-5 border-b border-zinc-800 pb-2">
                         <h2 class="gaming-font text-base md:text-lg font-black text-red-500 uppercase tracking-wide">🏆 TOURNAMENT STANDINGS</h2>
                         <button onclick="loadLeaderboard()" class="text-xs bg-zinc-950 hover:bg-zinc-900 px-3 py-1.5 rounded-md text-gray-400 border border-zinc-800 transition-all">🔄 Refresh Standings</button>
@@ -275,7 +301,7 @@
 
             <!-- 💳 PAGE 3: PAYMENTS TAB -->
             <div id="tab-payments" class="tab-page hidden">
-                <div class="max-w-xl bg-zinc-950/90 p-6 rounded-2xl border border-orange-500/30 shadow-md backdrop-blur-md">
+                <div class="max-w-xl bg-zinc-950/90 p-6 rounded-2xl border border-orange-500/30 shadow-md backdrop-blur-md animate-card-fade">
                     <h2 class="gaming-font text-base font-bold text-orange-500 mb-3 uppercase tracking-wider flex items-center gap-2">
                         <span class="animate-pulse text-red-500">⚡</span> <span>Tournament Fee Gate</span>
                     </h2>
