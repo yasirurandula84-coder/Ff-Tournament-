@@ -275,27 +275,77 @@
 
             <!-- 💳 PAGE 3: PAYMENTS TAB -->
             <div id="tab-payments" class="tab-page hidden">
-                <div class="max-w-xl bg-zinc-950/90 p-6 rounded-2xl border border-orange-500/30 shadow-md backdrop-blur-md">
-                    <h2 class="gaming-font text-base font-bold text-orange-500 mb-3 uppercase tracking-wider flex items-center gap-2">
-                        <span class="animate-pulse text-red-500">⚡</span> <span>Tournament Fee Gate</span>
-                    </h2>
-                    <p id="feeGateMessage" class="text-xs text-gray-400 mb-4 leading-relaxed">ගෙවීම් සිදුකර WhatsApp සමූහයට රිසිට්පත යොමු කරන්න.</p>
-                    
-                    <div id="paymentMethodsContainer" class="space-y-4 text-sm">
-                        <div class="bg-black/40 p-4 rounded-lg border border-zinc-800/80">
-                            <p class="text-orange-400 font-bold mb-1 uppercase tracking-wide text-xs">📱 eZ Cash / M Cash</p>
-                            <p class="text-gray-300 font-mono text-base tracking-wider" id="paymentEzCash">Loading...</p>
-                        </div>
-                        <div class="bg-black/40 p-4 rounded-lg border border-zinc-800/80">
-                            <p class="text-orange-400 font-bold mb-1 uppercase tracking-wide text-xs">🏦 Bank Transfer Details</p>
-                            <p class="text-gray-300 font-mono text-xs leading-relaxed whitespace-pre-line" id="paymentBank">Loading...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="max-w-xl bg-zinc-950/90 p-6 rounded-2xl border border-orange-500/30 shadow-md backdrop-blur-md">
+        <h2 class="gaming-font text-base font-bold text-orange-500 mb-3 uppercase tracking-wider flex items-center gap-2">
+            <span class="animate-pulse text-red-500">⚡</span> <span>Tournament Fee Gate</span>
+        </h2>
 
+                    
+                    <div id="paymentMethodsContainer" class="space-y-4 text-sm">
+                        <div class="bg-black/40 p-4 rounded-lg border border-zinc-800/80">
+                            <p class="text-orange-400 font-bold mb-1 uppercase tracking-wide text-xs">📱 eZ Cash / M Cash</p>
+                            <p class="text-gray-300 font-mono text-base tracking-wider" id="paymentEzCash">Loading...</p>
+                        </div>
+                        <div class="bg-black/40 p-4 rounded-lg border border-zinc-800/80">
+                            <p class="text-orange-400 font-bold mb-1 uppercase tracking-wide text-xs">🏦 Bank Transfer Details</p>
+                            <p class="text-gray-300 font-mono text-xs leading-relaxed whitespace-pre-line" id="paymentBank">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+        
+        <!-- 📢 මෙන්න මෙතන තමයි ප්ලේයර්ට Status එක සහ Alert මැසේජ් එක පෙන්වන්නේ -->
+        <div id="paymentAlertContainer" class="mb-4">
+            <p id="feeGateMessage" class="text-xs text-gray-400 leading-relaxed">ගෙවීම් සිදුකර පහතින් රිසිට්පත සයිට් එකට Upload කරන්න.</p>
         </div>
+        
+        <div id="paymentMethodsContainer" class="space-y-4 text-sm">
+            <div class="bg-black/40 p-4 rounded-lg border border-zinc-800/80">
+                <p class="text-orange-400 font-bold mb-1 uppercase tracking-wide text-xs">📱 eZ Cash / M Cash</p>
+                <p class="text-gray-300 font-mono text-base tracking-wider" id="paymentEzCash">Loading...</p>
+            </div>
+            <div class="bg-black/40 p-4 rounded-lg border border-zinc-800/80">
+                <p class="text-orange-400 font-bold mb-1 uppercase tracking-wide text-xs">🏦 Bank Transfer Details</p>
+                <p class="text-gray-300 font-mono text-xs leading-relaxed whitespace-pre-line" id="paymentBank">Loading...</p>
+            </div>
+        </div>
+
+        <!-- ========================================================== -->
+        <!-- 📤 [NEW] සයිට් එකටම RECEIPT එක UPLOAD කරන SECTION එක -->
+        <!-- ========================================================== -->
+        <div id="uploadSection" class="mt-6 pt-6 border-t border-zinc-800/80">
+            <p class="text-orange-500 font-bold text-xs uppercase tracking-wider mb-2">📸 Upload Payment Slip (රිසිට්පත අප්ලෝඩ් කරන්න)</p>
+            
+            <div class="space-y-3">
+                <!-- ක්‍රමය 1: ImgBB හෝ වෙනත් ලින්ක් එකක් පේස්ට් කිරීමට (ලේසිම ක්‍රමය) -->
+                <div>
+                    <label class="block text-zinc-500 text-[11px] mb-1">Receipt Image Link (රිසිට් ලින්ක් එක මෙතනට දාන්න):</label>
+                    <input type="text" id="receiptUrlInput" placeholder="https://i.ibb.co/xxxxx/receipt.jpg" 
+                           class="w-full bg-black border border-zinc-800 focus:border-orange-500 text-gray-200 text-xs px-3 py-2 rounded-lg outline-none transition-all font-mono">
+                </div>
+
+                <!-- ඉදිරියේදී File එකක්ම upload කරන්න ඕන නම් මේ Input එකත් පාවිච්චි කරන්න පුළුවන් -->
+                <!-- 
+                <div class="flex items-center justify-center w-full">
+                    <input type="file" id="receiptFileInput" class="hidden" accept="image/*">
+                </div> 
+                -->
+
+                <button id="btnSubmitReceipt" onclick="submitPlayerReceipt()" 
+                        class="w-full bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-500 hover:to-amber-400 text-black font-bold uppercase text-xs py-2.5 rounded-lg transition-all shadow-md active:scale-95">
+                    Submit Receipt 🚀
+                </button>
+            </div>
+        </div>
+        <!-- ========================================================== -->
+
     </div>
+</div>
+    
 
     <!-- ========================================================= -->
     <!--                       JAVASCRIPT LOGIC                     -->
@@ -605,6 +655,94 @@
             setInterval(fetchTournamentSettings, 10000); 
             setInterval(checkCurrentPlayerStatus, 10000); 
         };
+
+        // 📤 [NEW FIXED] රිසිට් එක SUBMIT කරන සහ UI එක UPDATE කරන FUNCTIONS
+        // =========================================================================
+        
+        // 1. ප්ලේයර්ගේ Status එක අනුව Payments Tab එකේ මැසේජ් මාරු කරන Function එක
+        function updatePaymentTabUI(player) {
+            const feeGateMessage = document.getElementById("feeGateMessage");
+            const uploadSection = document.getElementById("uploadSection");
+            if (!feeGateMessage || !uploadSection) return; // Error නොවෙන්න ආරක්ෂිතව Check කරා
+
+            // ප්ලේයර් තාම රිසිට් එකක් දාලම නැත්නම් හෝ Admin ඔහුව Reject කරලා නම්
+            if (player.payment_status === "Pending" && !player.payment_slip) {
+                feeGateMessage.innerHTML = `
+                    <div class="bg-red-500/10 border border-red-500/20 p-3 rounded-xl text-center mb-2">
+                        <p class="text-red-400 font-bold text-xs">❌ ඔයාගේ ගෙවීම් රිසිට්පත ප්‍රතික්ෂේප කර ඇත (Rejected) හෝ ඔබ තවමත් ගෙවා නැත!</p>
+                        <p class="text-gray-400 text-[11px] mt-0.5">කරුණාකර පහත ක්‍රමයකට Rs.200 ගෙවා, නිවැරදි රිසිට් ලින්ක් එක දමා නැවත Submit කරන්න.</p>
+                    </div>
+                `;
+                uploadSection.classList.remove("hidden"); // Input එක පෙන්වනවා
+            } 
+    }
+            // ප්ලේයර් රිසිට් එක දාලා Admin බලනකන් Pending ඉන්න වෙලාවක
+            else if (player.payment_status === "Pending" && player.payment_slip) {
+                feeGateMessage.innerHTML = `
+                    <div class="bg-amber-500/10 border border-amber-500/20 p-3 rounded-xl text-center mb-2">
+                        <p class="text-amber-400 font-bold text-xs">⏳ රිසිට්පත පරීක්ෂා කරමින් පවතී (Pending Verification)...</p>
+                        <p class="text-gray-400 text-[11px] mt-0.5">Admin විනාඩි කිහිපයක් ඇතුළත ඔබව Verify කරනු ඇත. කරුණාකර රැඳී සිටින්න.</p>
+                    </div>
+                `;
+                uploadSection.classList.add("hidden"); // ආයේ දාන්න බැරි වෙන්න හංගනවා
+            }
+    // Admin රිසිට් එක බලා Approve කරලා නම්
+            else if (player.payment_status === "Approved") {
+                feeGateMessage.innerHTML = `
+                    <div class="bg-green-500/10 border border-green-500/20 p-3 rounded-xl text-center mb-2">
+                        <p class="text-green-400 font-bold text-xs">✅ ඔබ සාර්ථකව සම්බන්ධ වී ඇත (Verified Player)!</p>
+                        <p class="text-gray-400 text-[11px] mt-0.5">ඔබගේ ගෙවීම් සාර්ථකයි. තරඟාවලියට සහභාගී විය හැක.</p>
+                    </div>
+                `;
+                uploadSection.classList.add("hidden"); // Approved නිසා හංගනවා
+            }
+        
+
+        // 2. Submit Button එක එබුවම ඩේටා Backend යවන Function එක
+        async function submitPlayerReceipt() {
+            const receiptUrl = document.getElementById('receiptUrlInput').value.trim();
+            
+            // LocalStorage එකේ සේව් කරපු ff_player Object එකෙන් WhatsApp අංකය ගන්නවා
+            const storedPlayer = localStorage.getItem('ff_player');
+            if (!storedPlayer) {
+                alert("කරුණාකර නැවත ලොග් වන්න! ❌");
+                return;
+            }
+            const playerObj = JSON.parse(storedPlayer);
+            const playerWhatsapp = playerObj.whatsapp;
+
+            if (!receiptUrl) {
+                alert("කරුණාකර වලංගු රිසිට් ලින්ක් එකක් ඇතුළත් කරන්න! ❌");
+                return;
+            }
+            try {
+                const response = await fetch(`${API_URL}/api/player/upload-receipt`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ whatsapp: playerWhatsapp, payment_slip: receiptUrl })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert("රිසිට්පත සාර්ථකව සයිට් එකට ලැබුණා! Admin පරීක්ෂා කරන තෙක් රැඳී සිටින්න. ⏳");
+                    document.getElementById('receiptUrlInput').value = ""; // Input එක clear කරනවා
+                    
+                    // LocalStorage එකේ තියෙන ප්ලේයර්ගේ ඩේටා ටිකත් අලුත් කරලා UI එක update කරනවා
+                    playerObj.payment_status = "Pending";
+                    playerObj.payment_slip = receiptUrl;
+                    localStorage.setItem('ff_player', JSON.stringify(playerObj));
+                    
+                    updatePaymentTabUI(playerObj);
+                } else {
+                    alert(data.message || "Error uploading receipt! ❌");
+                }
+            } catch (error) {
+                console.error("Upload error:", error);
+                alert("Server එකට සම්බන්ධ වීමට නොහැකි වුණා! ❌");
+            }
+        }
+        
     </script>
 </body>
 </html>
