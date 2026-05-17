@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
 const axios = require('axios');
+const rateLimit = require('express-rate-limit'); // 👈 [NEW] Security Package එක එකතු කරා
 require('dotenv').config();
 
 const app = express();
@@ -49,8 +50,19 @@ const playerSchema = new mongoose.Schema({
 
 const Player = mongoose.model('Player', playerSchema);
 
-// === 💾 1. PLAYER REGISTRATION ROUTE ===
-app.post('/api/register', async (req, res) => {
+// === 🛡️ [NEW LOGIC] SPAM ANTI-BOT SECURITY CONTROLLER ===
+// එකම IP එකකින් විනාඩි 15ක් ඇතුළත උපරිම 3 වතාවකට වඩා Register විය නොහැක.
+const registerLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // විනාඩි 15 ක කාල සීමාවක්
+    max: 3, // උපරිම අවස්ථා 3යි
+    message: { message: "සීමාව ඉක්මවා ඇත! බොරු දත්ත ඇතුලත් කිරීමෙන් වළකින්න. කරුණාකර විනාඩි 15කින් නැවත උත්සාහ කරන්න. 🚫" },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+
+// === 💾 1. PLAYER REGISTRATION ROUTE (WITH ANTI-SPAM PROTECTION) ===
+app.post('/api/register', registerLimiter, async (req, res) => { // 👈 registerLimiter එක මෙතනට දැම්මා
     try {
         const { whatsapp, password, ff_name, ff_id } = req.body;
 
@@ -91,7 +103,7 @@ app.post('/api/register', async (req, res) => {
         if (finalFee === 0) {
             res.status(201).json({ message: `Registration Successful! ඔයා මුල්ම 10 දෙනා අතර සිටින බැවින් ලියාපදිංචිය නොමිලේ (Free)! 🔥 Slot: ${playerCount + 1}/10` });
         } else {
-            res.status(201).json({ message: "Registration Successful! කරුණාකර ලියාපදිංචි ගාස්තුව (Rs.200) ගෙවා රිසිට්පත අප්ලෝඩ් කරන්න. 💸" });
+            res.status(201).json({ message: "Registration Successful! කරුණාකර ලියාපදිංචි ගාස්තුව (Rs.200) ගෙවා ਰਿਸිට්පත අප්ලෝඩ් කරන්න. 💸" });
         }
 
     } catch (error) {
@@ -145,7 +157,7 @@ app.get('/api/players/:whatsapp', async (req, res) => {
             points: player.points,
             reg_fee: player.reg_fee,
             payment_status: player.payment_status,
-            payment_slip: player.payment_slip, // Slip එකත් pass කරා
+            payment_slip: player.payment_slip, 
             isBanned: player.isBanned
         });
     } catch (err) {
@@ -204,7 +216,7 @@ app.get('/sudda', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'sudda.html'));
 });
 
-// === 📈 8. ප්ලේයර් කෙනෙක්ගේ Points වෙනස් කිරීමේ API එක ===
+// === 8. ප්ලේයර් කෙනෙක්ගේ Points වෙනස් කිරීමේ API එක ===
 app.post('/api/admin/update-points', async (req, res) => {
     const { adminPassword, whatsapp, newPoints } = req.body;
     if (adminPassword !== "admin123") return res.status(403).json({ message: "Invalid Admin Password!" });
@@ -244,7 +256,6 @@ app.post('/api/admin/delete-player', async (req, res) => {
     }
 
     try {
-        // ඩේටාබේස් එකෙන් WhatsApp අංකය සොයා සම්පූර්ණයෙන්ම මකා දමයි
         const player = await Player.findOneAndDelete({ whatsapp: whatsapp });
         
         if (!player) {
@@ -258,7 +269,7 @@ app.post('/api/admin/delete-player', async (req, res) => {
 });
 
 // =========================================================================
-// === 📑 [NEW FIXED] RECEIPT / APPROVAL SYSTEM ENDPOINTS FOR ADMIN PANEL ===
+// === 📑 RECEIPT / APPROVAL SYSTEM ENDPOINTS FOR ADMIN PANEL ===
 // =========================================================================
 
 // 1. Pending තියෙන, රිසිට් එකක් upload කරපු ප්ලේයර්ස්ලා විතරක් ගන්න API එක
@@ -267,18 +278,16 @@ app.post('/api/admin/pending-receipts', async (req, res) => {
     if (adminPassword !== "admin123") return res.status(403).json({ message: "Invalid Admin Password!" });
 
     try {
-        // payment_status එක "Pending" සහ payment_slip එක හිස් නැති අය විතරක් සොයයි
         const pendingPlayers = await Player.find({
             payment_status: "Pending",
             payment_slip: { $ne: "" }
         }, 'whatsapp ff_name ff_id payment_slip payment_status');
         
-        // Frontend එක බලාපොරොත්තු වන විදියට 'receipt_url' කියන field එකට map කරනවා
         const formattedPlayers = pendingPlayers.map(p => ({
             whatsapp: p.whatsapp,
             ff_name: p.ff_name,
             ff_id: p.ff_id,
-            receipt_url: p.payment_slip, // Schema එකේ තියෙන slip එක මෙතනට map කරා
+            receipt_url: p.payment_slip, 
             payment_status: p.payment_status
         }));
 
@@ -290,7 +299,7 @@ app.post('/api/admin/pending-receipts', async (req, res) => {
 
 // 2. රිසිට් එක Approve හෝ Reject කරන Main API එක
 app.post('/api/admin/review-receipt', async (req, res) => {
-    const { adminPassword, whatsapp, action } = req.body; // action = 'APPROVE' හෝ 'REJECT'
+    const { adminPassword, whatsapp, action } = req.body; 
     if (adminPassword !== "admin123") return res.status(403).json({ message: "Invalid Admin Password!" });
 
     try {
@@ -301,7 +310,6 @@ app.post('/api/admin/review-receipt', async (req, res) => {
             updateData = { payment_status: "Approved" };
             successMessage = "Payment Approved and Player Verified! ✅";
         } else if (action === "REJECT") {
-            // Reject කරොත් ආයෙත් ප්ලේයර්ට රිසිට් එකක් දාන්න පුළුවන් වෙන්න status එක Pending කරලා slip එක හිස් කරනවා
             updateData = { payment_status: "Pending", payment_slip: "" };
             successMessage = "Receipt Rejected! Account set back to pending. ❌";
         } else {
@@ -316,7 +324,6 @@ app.post('/api/admin/review-receipt', async (req, res) => {
         res.status(500).json({ message: "Database verification error!" });
     }
 });
-
 
 // === 🚀 SERVER LISTEN ===
 const PORT = process.env.PORT || 5000;
